@@ -6,6 +6,7 @@ import {
 } from "@/components/shared/broadcast-ui";
 import { MediaImage } from "@/components/shared/media-image";
 import { hasStream, isCurrent, todaySchedules } from "@/lib/broadcast";
+import { getStreamSource } from "@/lib/media-utils";
 import type { Schedule, Settings, Station } from "@/data/types";
 export function StationStatusCard({
   station,
@@ -29,6 +30,8 @@ export function StationStatusCard({
   const index = programs.findIndex((s) => isCurrent(s, now, settings.timezone));
   const current = programs[index];
   const next = index >= 0 ? programs[index + 1] : undefined;
+  const source = available ? getStreamSource(station.streamUrl!) : null;
+
   return (
     <article className={`station-status-card panel ${station.id}`}>
       <div className="flex items-center justify-between gap-2">
@@ -46,12 +49,24 @@ export function StationStatusCard({
             src={settings.fallbackImage}
             alt="Gedung RRI Padang"
           />
+        ) : source?.type === "youtube" ? (
+          <img 
+            src={`https://img.youtube.com/vi/${source.videoId}/hqdefault.jpg`}
+            alt="YouTube Stream Preview"
+            className="w-full h-full object-cover"
+          />
+        ) : source?.type === "video" || source?.type === "unknown" ? (
+           <div className="w-full h-full bg-[#020c17] flex flex-col items-center justify-center text-text-muted gap-2">
+             <span className="material-symbols-outlined text-4xl">play_circle</span>
+             <span className="text-xs">SUMBER VIDEO</span>
+           </div>
         ) : (
-          <div className="w-full h-full bg-[#020c17] flex items-center justify-center text-text-muted">
-            <span className="material-symbols-outlined text-4xl">sensors</span>
+          <div className="w-full h-full bg-[#020c17] flex flex-col items-center justify-center text-text-muted gap-2">
+             <span className="material-symbols-outlined text-4xl">broken_image</span>
+             <span className="text-xs">PRATINJAU TIDAK TERSEDIA</span>
           </div>
         )}
-        <span>{available ? "SUMBER TERSEDIA" : "FALLBACK AKTIF"}</span>
+        <span>{available ? (source?.type === "youtube" ? "YOUTUBE TERSEDIA" : "SUMBER TERSEDIA") : "FALLBACK AKTIF"}</span>
       </div>
       <div className="station-current">
         <div className="flex justify-between gap-2">

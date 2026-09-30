@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Fixed — 2026-09-30 16:07 WIB
+- Fixed Dashboard station previews incorrectly showing the obsolete `sensors` placeholder despite valid Supabase stream URLs.
+- Unified Dashboard stream source parsing with the Streaming and Public Board data flow using `getStreamSource`.
+- Added lightweight YouTube thumbnail previews for configured station streams while keeping Dashboard previews muted/non-autoplay.
+- Handled YouTube shorts URL parsing by adding support for `shorts/` in `lib/media-utils.ts`.
+- Preserved fallback images exclusively for stations without configured stream URLs.
+
 ### Fixed — 2026-09-30 16:01 WIB
 - Fixed `/admin/streaming` crashing with `Missing AudioProvider` when rendering stream previews.
 - Decoupled Admin stream previews from the public broadcast AudioProvider by introducing `mode="broadcast" | "preview"` logic for players.

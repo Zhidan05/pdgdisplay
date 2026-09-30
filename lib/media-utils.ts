@@ -42,7 +42,7 @@ export async function uploadImageToSupabase(file: File, folder: string): Promise
 
 export function parseYouTubeVideoId(url: string): string | null {
   if (!url) return null;
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|live\/))([^#&?]*).*/);
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|live\/|shorts\/))([^#&?]*).*/);
   return match && match[1].length === 11 ? match[1] : null;
 }
 
