@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -12,7 +13,9 @@ import {
   Settings2,
   Tv,
   UserRound,
-  LogOut
+  LogOut,
+  Menu,
+  X
 } from "lucide-react";
 import { RriBrand } from "@/components/shared/broadcast-ui";
 import { useBoardData } from "@/lib/supabase-provider";
@@ -37,6 +40,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const { settings, stations } = useBoardData();
   const now = useClock();
   const active = stations.filter((s) => hasStream(s.streamUrl)).length;
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   const handleLogout = async () => {
     const supabase = createClient();
@@ -44,10 +48,39 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     router.push("/login");
     router.refresh();
   };
-  
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isSidebarOpen) setIsSidebarOpen(false);
+    };
+    if (isSidebarOpen) {
+      document.body.style.overflow = "hidden";
+      document.addEventListener("keydown", handleKeyDown);
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isSidebarOpen]);
+
   return (
     <div className="admin-shell">
-      <aside className="admin-sidebar">
+      {isSidebarOpen && (
+        <div 
+          className="sidebar-backdrop" 
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+      <aside id="admin-mobile-sidebar" className={`admin-sidebar ${isSidebarOpen ? "open" : ""}`}>
+        <button 
+          className="sidebar-close" 
+          onClick={() => setIsSidebarOpen(false)}
+          aria-label="Tutup menu"
+        >
+          <X size={24} />
+        </button>
         <RriBrand
           compact
           name={settings.stationName}
@@ -66,6 +99,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 href={href}
                 className={path === href ? "active" : ""}
                 aria-current={path === href ? "page" : undefined}
+                onClick={() => setIsSidebarOpen(false)}
               >
                 <Icon size={19} />
                 <span>{label}</span>
@@ -75,6 +109,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               </Link>
             </div>
           ))}
+          <button 
+            className="sidebar-logout" 
+            onClick={handleLogout}
+          >
+            <LogOut size={19} />
+            <span>Keluar</span>
+          </button>
         </nav>
         <div className="sidebar-bottom">
           <Radio size={22} />
@@ -86,6 +127,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <div className="admin-main">
         <header className="admin-header">
           <div>
+            <button 
+              className="sidebar-toggle"
+              onClick={() => setIsSidebarOpen(true)}
+              aria-label="Buka menu"
+              aria-expanded={isSidebarOpen}
+              aria-controls="admin-mobile-sidebar"
+            >
+              <Menu size={20} />
+            </button>
             <span className="admin-breadcrumb">
               RRI PADANG <ChevronRight size={13} />
             </span>
@@ -106,20 +156,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               <i />
               {active} saluran tersedia
             </span>
-            <Link className="button secondary" href="/" target="_blank">
-              Lihat Info Board <ExternalLink size={15} />
+            <Link className="button secondary info-board-btn" href="/" target="_blank">
+              <span className="info-board-text">Lihat Info Board</span> <ExternalLink size={15} />
             </Link>
             <span className="operator-avatar" title="Operator lokal">
               <UserRound size={19} />
             </span>
-            <button 
-              onClick={handleLogout}
-              className="icon-button" 
-              title="Keluar"
-              style={{ marginLeft: '10px' }}
-            >
-              <LogOut size={19} />
-            </button>
           </div>
         </header>
         <main className="admin-content">{children}</main>

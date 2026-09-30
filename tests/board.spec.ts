@@ -332,3 +332,27 @@ test("invalid saved data recovers; storage failure is reported without losing th
   await expect(page.getByRole("status")).toContainText("untuk sesi ini");
   await expect(page.locator(".brand-type strong")).toHaveText("SESSION ONLY");
 });
+
+test("admin mobile navigation trigger and drawer behavior", async ({ page }) => {
+  // Mobile test
+  await page.setViewportSize({ width: 400, height: 704 });
+  await page.goto("/admin");
+  const hamburger = page.locator(".sidebar-toggle");
+  await expect(hamburger).toBeVisible();
+  const sidebar = page.locator("#admin-mobile-sidebar");
+  await expect(sidebar).not.toHaveClass(/open/);
+  
+  await hamburger.click();
+  await expect(sidebar).toHaveClass(/open/);
+  await expect(page.getByRole("link", { name: "Streaming" })).toBeVisible();
+  
+  // Click nav item
+  await page.getByRole("link", { name: "Streaming" }).click();
+  await expect(page).toHaveURL(/.*\/admin\/streaming/);
+  await expect(sidebar).not.toHaveClass(/open/);
+  
+  // Desktop test
+  await page.setViewportSize({ width: 1366, height: 768 });
+  await expect(hamburger).not.toBeVisible();
+  await expect(page.getByRole("link", { name: "Streaming" })).toBeVisible();
+});

@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Fixed — 2026-09-30 20:51 WIB
+
+- Fixed missing mobile Admin navigation trigger when the persistent desktop sidebar is hidden.
+- Added a visible hamburger button that opens the existing off-canvas Admin navigation drawer on phone and tablet layouts.
+- Aligned mobile drawer and desktop sidebar breakpoints to prevent navigation from becoming inaccessible.
+
 ### Changed — 2026-09-30 20:40 WIB
 
 - Moved the public header timezone label "WIB" to the right side of the clock for a cleaner single-line time display.

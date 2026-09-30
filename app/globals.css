@@ -838,6 +838,9 @@
     font-size: 10px;
     transition: color 300ms ease;
   }
+  .sidebar-backdrop, .sidebar-close, .sidebar-toggle {
+    display: none;
+  }
   .admin-sidebar {
     position: fixed;
     inset: 0 auto 0 0;
@@ -878,16 +881,30 @@
   }
   .admin-sidebar nav {
     padding: 0 12px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow-y: auto;
   }
-  .admin-sidebar nav a {
+  .admin-sidebar nav a,
+  .sidebar-logout {
     @apply flex items-center gap-3;
+    width: 100%;
     color: var(--text-secondary);
     font-size: 13px;
     padding: 13px 12px;
     border-radius: 6px;
     margin-bottom: 5px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
   }
-  .admin-sidebar nav a:hover {
+  .sidebar-logout {
+    margin-top: auto;
+  }
+  .admin-sidebar nav a:hover,
+  .sidebar-logout:hover {
     background: var(--bg-panel);
     color: white;
   }
@@ -1776,30 +1793,85 @@
     grid-template-columns: 1fr;
   }
 }
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 40;
+  }
+  .sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    width: 44px;
+    height: 44px;
+    margin-left: -12px;
+    cursor: pointer;
+  }
+  .sidebar-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
   .admin-sidebar {
-    position: static;
-    width: 100%;
+    position: fixed;
+    inset: 0 auto 0 -100%;
+    width: min(84vw, 320px);
+    height: 100%;
+    z-index: 50;
+    transition: left 0.3s ease;
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border-subtle);
+  }
+  .admin-sidebar.open {
+    left: 0;
   }
   .admin-sidebar .rri-brand {
-    flex-direction: row;
-    align-items: center;
-    padding: 14px 18px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px 20px;
   }
   .admin-sidebar .brand-logo {
-    width: 90px;
+    width: 110px;
   }
   .admin-sidebar nav {
     display: flex;
-    overflow-x: auto;
-    padding: 8px;
+    flex-direction: column;
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 12px;
   }
-  .admin-sidebar nav a {
-    white-space: nowrap;
-    font-size: 11px;
+  .admin-sidebar nav a,
+  .sidebar-logout {
+    white-space: normal;
+    font-size: 13px;
+    padding: 12px 14px;
+    margin-bottom: 4px;
+    margin-top: auto;
   }
   .sidebar-label,
   .sidebar-bottom {
+    display: block;
+  }
+  .info-board-btn {
+    padding: 8px;
+  }
+  .info-board-text {
     display: none;
   }
   .admin-main {
