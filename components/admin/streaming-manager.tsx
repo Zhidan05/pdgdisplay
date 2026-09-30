@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Save } from "lucide-react";
 import type { Station } from "@/data/types";
 import { useBoardData } from "@/lib/supabase-provider";
@@ -15,6 +15,14 @@ function StreamSettingsCard({ station }: { station: Station }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [draftUrl, setDraftUrl] = useState(station.streamUrl ?? "");
+
+  // Update draft if external station data changes
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDraftUrl(station.streamUrl ?? "");
+  }, [station.streamUrl]);
 
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -52,13 +60,14 @@ function StreamSettingsCard({ station }: { station: Station }) {
       </h2>
       <LiveStreamPanel
         compact
-        station={station}
+        station={{ ...station, streamUrl: draftUrl }}
         current={data.schedules.find(
           (s) =>
             s.channel === station.id &&
             isCurrent(s, now, data.settings.timezone),
         )}
         fallbackImage={data.settings.fallbackImage}
+        mode="preview"
       />
       <form key={JSON.stringify(station)} onSubmit={save}>
         <Field
@@ -67,7 +76,8 @@ function StreamSettingsCard({ station }: { station: Station }) {
         >
           <input
             name="streamUrl"
-            defaultValue={station.streamUrl ?? ""}
+            value={draftUrl}
+            onChange={(e) => setDraftUrl(e.target.value)}
             placeholder="https://youtube.com/live/... atau siaran.mp4"
             maxLength={2000}
             disabled={loading}

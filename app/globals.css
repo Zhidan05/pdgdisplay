@@ -394,7 +394,16 @@
   .stream-video {
     position: absolute;
     inset: 0;
-    object-fit: contain;
+  }
+  .stream-video > iframe,
+  .stream-video > div {
+    width: 100% !important;
+    height: 100% !important;
+    border: none;
+    display: block;
+  }
+  video.stream-video {
+    object-fit: cover;
   }
   .live-top {
     @apply flex items-center justify-between;
@@ -418,48 +427,13 @@
     background: transparent !important;
     box-shadow: none !important;
     padding: 0 !important;
+    min-height: auto !important;
   }
   .live-top .channel-img {
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+    height: 24px !important;
   }
-  .live-caption {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 50px 20px 20px;
-    background: transparent !important;
-    background-image: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    box-shadow: none !important;
-    border: none;
-    pointer-events: none;
-    z-index: 2;
-  }
-  .live-caption > span {
-    @apply flex items-center gap-2;
-    color: var(--accent);
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    font-weight: 650;
-    transition: color 300ms ease;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.65);
-  }
-  .live-caption h2 {
-    font-size: clamp(18px, 1.5vw, 26px);
-    font-weight: 750;
-    line-height: 1.2;
-    margin: 4px 0;
-    color: #ffffff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.65);
-  }
-  .live-caption p {
-    @apply flex items-center gap-2;
-    color: #d4dde7;
-    font-size: 12px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.65);
-  }
+
   .live-footer {
     @apply flex items-center justify-between gap-3;
     min-height: 38px;
@@ -500,12 +474,17 @@
     justify-content: center;
     flex-direction: column;
     text-align: center;
-    width: 100%;
-    padding: 20px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.85);
+    width: 85%;
+    max-width: 360px;
+    padding: 24px 32px;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   }
   .offline-message > img {
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)) brightness(0) invert(1);
+    filter: brightness(0) invert(1);
   }
   .offline-message > span {
     font-size: 10px;
@@ -513,7 +492,6 @@
     letter-spacing: 1.5px;
     font-weight: 700;
     transition: color 300ms ease;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.9);
   }
   .offline-message h2 {
     font-size: clamp(16px, 1.4vw, 22px);

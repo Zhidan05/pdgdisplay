@@ -26,7 +26,7 @@ export const latestInfo: InfoItem[] = [
   },
   {
     id: "studio-info",
-    image: "/images/rri/studio.jpg",
+    image: "/images/rri/logo.png",
     title: "Lebih dekat dengan suara yang menemani",
     description:
       "Dengarkan cerita, inspirasi, dan kabar dari Ranah Minang bersama penyiar RRI Padang setiap hari.",

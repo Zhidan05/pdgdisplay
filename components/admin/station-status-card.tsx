@@ -40,11 +40,17 @@ export function StationStatusCard({
       </div>
       <p className="station-tagline">{station.tagline}</p>
       <div className="station-preview">
-        <MediaImage
-          key={available ? "studio" : settings.fallbackImage}
-          src={available ? "/rri/studio.jpg" : settings.fallbackImage}
-          alt={available ? "Pratinjau studio" : "Gedung RRI Padang"}
-        />
+        {!available && settings.fallbackImage && !settings.fallbackImage.includes("studio.jpg") ? (
+          <MediaImage
+            key={settings.fallbackImage}
+            src={settings.fallbackImage}
+            alt="Gedung RRI Padang"
+          />
+        ) : (
+          <div className="w-full h-full bg-[#020c17] flex items-center justify-center text-text-muted">
+            <span className="material-symbols-outlined text-4xl">sensors</span>
+          </div>
+        )}
         <span>{available ? "SUMBER TERSEDIA" : "FALLBACK AKTIF"}</span>
       </div>
       <div className="station-current">

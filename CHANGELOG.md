@@ -2,14 +2,54 @@
 
 ## [Unreleased]
 
+### Fixed — 2026-09-30 16:01 WIB
+- Fixed `/admin/streaming` crashing with `Missing AudioProvider` when rendering stream previews.
+- Decoupled Admin stream previews from the public broadcast AudioProvider by introducing `mode="broadcast" | "preview"` logic for players.
+- Introduced `useOptionalAudio` to ensure local stream components degrade gracefully without requiring the global context.
+- Preserved global broadcast audio control exclusively for the public Info Board.
+- Ensured multiple Admin stream preview cards initialize muted automatically without modifying public audio preferences.
+- Allowed Admin stream previews to seamlessly preview stream URL drafts dynamically before persisting to the database.
+
+### Fixed — 2026-09-30 15:52 WIB
+- Refactored Jadwal Program to support selecting multiple days per schedule using a `smallint[]` representation instead of a single string.
+- Replaced the single "Hari siaran" dropdown with a checkbox group and useful presets (Senin-Jumat, Akhir Pekan, Setiap Hari).
+- Implemented robust conflict prevention at both the client-side (React) and database-side (PostgreSQL Trigger) levels.
+- Fixed conflict overlap logic to safely and accurately handle overnight schedules (e.g., 23:00 - 02:00 spilling over to the next day).
+- Handled PostgreSQL schema migration ensuring seamless data mapping to array types while retaining existing properties safely.
+
+### Fixed — 2026-09-30 15:38 WIB
+- Fixed stream player sizing so live content perfectly fills the available media container without unintended application-level gaps.
+- Removed stale references to the deprecated `studio` fallback and standardized fallback resolution through the current Supabase setting.
+- Fixed global broadcast audio synchronization so mute/unmute UI state reflects the active player's actual state.
+- Prevented autoplay retry logic from overriding an explicit user mute.
+- Secured stale player references and cleanup routines during channel and Realtime source changes.
+
+### Fixed — 2026-09-30 15:29 WIB
+- Fixed a runtime `NotFoundError` caused by conflicting YouTube player teardown and React DOM reconciliation during PRO channel switching.
+- Stabilized player lifecycle when switching between YouTube streams, OFF AIR states, and Realtime stream updates.
+- Prevented duplicate/stale player cleanup from attempting to remove already-detached DOM nodes.
+- Preserved broadcast audio preference during channel transitions.
+- Reused YouTube player instances when both the old and new sources are YouTube videos by utilizing `player.loadVideoById`, eliminating unnecessary mounting and unmounting.
+
+### Changed
+- Simplified the live stream overlay by removing the large program title, presenter name, and ON AIR badge.
+- Moved the live broadcast indicator into the channel identity block beneath the PRO logo.
+- Replaced the “SIARAN LANGSUNG” label with a compact “LIVE” indicator.
+- Changed broadcast audio startup strategy to prefer audible autoplay and only fall back to muted playback when required by browser policy.
+- Audio preference now defaults to enabled for the dedicated RRI Info Board environment.
+- Preserved preferred audio state across channel switching, player recreation, and Realtime stream updates.
+
 ### Added
+- Added graceful autoplay-block detection and automatic muted fallback for both HTML and YouTube players.
+- Added automatic sound retry after a valid user interaction when audible autoplay was blocked.
+- Added optional dedicated-display browser autoplay deployment guidance.
 - Functional Supabase Storage upload flow for dynamic board images (Infos, Posters, Fallback).
 - Reusable image upload utility `lib/media-utils.ts` and `URL.createObjectURL()` previews.
 - YouTube URL parsing and embed preview for streaming channels.
 - End-to-end dashboard CRUD operations fully connected to Supabase Database.
 - Consistent save/loading/error feedback across all admin forms.
 
-### Changed
+
 - Removed the white background container from the PRO channel logo exclusively within the stream overlay (`.live-top`), replacing it with a drop-shadow so the logo remains visible without obscuring the video.
 - Synchronized the streaming overlay title strictly with the currently active schedule. The title (and presenter) will now only appear if a matching schedule exists for the selected channel and current time, removing the hardcoded fallback "Bersama RRI Padang" to ensure absolute data accuracy.
 - Drastically simplified the stream overlay for both ON AIR and OFF AIR states by stripping away heavy translucent background panels and dim layers, relying instead on clean typography with crisp text-shadows and ultra-light bottom gradients. This maximizes the visibility of the stream/poster content.

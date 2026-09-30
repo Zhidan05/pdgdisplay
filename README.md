@@ -70,6 +70,19 @@ VALUES (
 > [!NOTE]
 > Ensure you have already executed `supabase/schema.sql` and `supabase/policies.sql` before inserting into the `profiles` table.
 
+## Dedicated Display Mode (Chrome Kiosk)
+
+This application is primarily intended for a controlled RRI television/display computer. The application employs a best-effort strategy to autoplay broadcast audio, falling back to muted playback gracefully if blocked by the browser. 
+
+For the most reliable production deployment on a dedicated controlled Windows/Chrome display, the administrator should launch Chrome with an autoplay policy that permits playback without a user gesture.
+
+**Example deployment configuration:**
+```sh
+chrome.exe --kiosk http://localhost:3000 --autoplay-policy=no-user-gesture-required
+```
+> [!NOTE]
+> This browser flag configuration is completely optional and must ONLY be applied by the system administrator on a dedicated managed display device. Do not attempt to enforce this flag or launch Chrome directly from the Next.js application.
+
 ## Behavior
 
 PRO 1 defaults to a local studio demo clip; PRO 2 and PRO 4 have empty stream URLs. ON AIR/OFF AIR is derived solely from the presence of a trimmed URL. It is not a real availability check. Clearing a URL switches to the static office fallback. Direct MP4/WebM URLs are supported; failed video loading retains the studio preview instead of displaying a broken player.

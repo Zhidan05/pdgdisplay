@@ -61,6 +61,6 @@ export const schedules: Schedule[] = (
       "Tim Redaksi",
       "Bella & Dika",
     ][i],
-    day: "daily",
+    daysOfWeek: [1, 2, 3, 4, 5, 6, 7],
   })),
 );

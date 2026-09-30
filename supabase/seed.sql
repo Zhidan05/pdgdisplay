@@ -10,7 +10,7 @@ INSERT INTO public.settings (key, value) VALUES
 ('station_name', 'RRI PADANG'),
 ('board_title', 'Radio Republik Indonesia'),
 ('timezone', 'Asia/Jakarta'),
-('fallback_image', '/rri/studio.jpg')
+('fallback_image', '')
 ON CONFLICT (key) DO NOTHING;
 
 -- Insert seed Infos
@@ -36,18 +36,18 @@ BEGIN
   SELECT id INTO pro4_id FROM public.stations WHERE code = 'PRO4';
 
   IF pro1_id IS NOT NULL THEN
-    INSERT INTO public.schedules (station_id, title, presenter, start_time, end_time, day_of_week) VALUES
-    (pro1_id, 'Padang Pagi Ini', 'Budi Santoso', '05:30', '09:00', 'daily'),
-    (pro1_id, 'Dinamika Olahraga', 'Rio Pratama', '15:00', '16:00', 'daily');
+    INSERT INTO public.schedules (station_id, title, presenter, start_time, end_time, days_of_week) VALUES
+    (pro1_id, 'Padang Pagi Ini', 'Budi Santoso', '05:30', '09:00', '{1,2,3,4,5,6,7}'),
+    (pro1_id, 'Dinamika Olahraga', 'Rio Pratama', '15:00', '16:00', '{1,2,3,4,5,6,7}');
   END IF;
 
   IF pro2_id IS NOT NULL THEN
-    INSERT INTO public.schedules (station_id, title, presenter, start_time, end_time, day_of_week) VALUES
-    (pro2_id, 'Sore Ceria', 'Siti Rahma', '16:00', '18:00', 'daily');
+    INSERT INTO public.schedules (station_id, title, presenter, start_time, end_time, days_of_week) VALUES
+    (pro2_id, 'Sore Ceria', 'Siti Rahma', '16:00', '18:00', '{1,2,3,4,5,6,7}');
   END IF;
 
   IF pro4_id IS NOT NULL THEN
-    INSERT INTO public.schedules (station_id, title, presenter, start_time, end_time, day_of_week) VALUES
-    (pro4_id, 'Apresiasi Budaya Minang', 'Dt. Rajo Mantari', '20:00', '22:00', 'daily');
+    INSERT INTO public.schedules (station_id, title, presenter, start_time, end_time, days_of_week) VALUES
+    (pro4_id, 'Apresiasi Budaya Minang', 'Dt. Rajo Mantari', '20:00', '22:00', '{1,2,3,4,5,6,7}');
   END IF;
 END $$;

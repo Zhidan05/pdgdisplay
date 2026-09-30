@@ -8,7 +8,7 @@ test("schedule boundaries use the configured timezone and previous day for overn
     channel: "pro1",
     start: "23:00",
     end: "02:00",
-    day: "1",
+    daysOfWeek: [1],
     program: "Malam",
     presenter: "",
   };
@@ -237,7 +237,7 @@ test("admin CRUD persists and synchronizes to an open public board", async ({
     .click();
   await page.getByLabel("Nama program").fill("Program uji");
   await page.getByLabel("Saluran", { exact: true }).selectOption("pro4");
-  await page.getByLabel("Hari siaran").selectOption("2");
+  await page.getByRole("checkbox", { name: "Selasa", exact: true }).check();
   await page
     .getByRole("button", { name: "Simpan perubahan", exact: true })
     .click();

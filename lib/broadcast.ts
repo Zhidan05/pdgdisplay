@@ -1,4 +1,5 @@
 import type { Schedule } from "@/data/types";
+import { isScheduleActiveNow } from "./board/schedule-utils";
 export const channelName = (id: string) => id.replace("pro", "PRO ");
 export const hasStream = (url: string | null) => Boolean(url?.trim());
 export function timeParts(date: Date, timezone: string) {
@@ -21,19 +22,7 @@ export const minutes = (time: string) =>
   Number(time.split(":")[0]) * 60 + Number(time.split(":")[1]);
 export function isCurrent(item: Schedule, now: Date | null, timezone: string) {
   if (!now) return false;
-  const { minutes: current, day } = timeParts(now, timezone);
-  const start = minutes(item.start),
-    end = minutes(item.end);
-  const overnight = end < start;
-  const matchingDay =
-    item.day === "daily" ||
-    Number(item.day) === (overnight && current < end ? (day + 6) % 7 : day);
-  return (
-    matchingDay &&
-    (overnight
-      ? current >= start || current < end
-      : current >= start && current < end)
-  );
+  return isScheduleActiveNow(item.daysOfWeek || [], item.start, item.end, now, timezone);
 }
 export function todaySchedules(
   items: Schedule[],
@@ -42,14 +31,17 @@ export function todaySchedules(
 ) {
   if (!now)
     return items
-      .filter((s) => s.day === "daily")
+      .filter((s) => (s.daysOfWeek || []).length === 7)
       .sort((a, b) => a.start.localeCompare(b.start));
-  const { day } = timeParts(now, timezone);
+      
+  const dayName = now.toLocaleDateString("en-US", { timeZone: timezone, weekday: "short" });
+  const map: Record<string, number> = { Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 7 };
+  const currentDay = map[dayName] || 1;
+
   return items
     .filter(
       (s) =>
-        s.day === "daily" ||
-        Number(s.day) === day ||
+        (s.daysOfWeek || []).includes(currentDay) ||
         isCurrent(s, now, timezone),
     )
     .sort((a, b) => a.start.localeCompare(b.start));

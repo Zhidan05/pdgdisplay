@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Maximize, Settings2 } from "lucide-react";
+import { Maximize, Settings2, Volume2, VolumeX } from "lucide-react";
 import { BroadcastStatus, ChannelLogo, RriBrand } from "@/components/shared/broadcast-ui";
 import { hasStream } from "@/lib/broadcast";
+import { useAudio } from "./audio-context";
 import type { ChannelId, Settings, Station } from "@/data/types";
 
 export function BroadcastHeader({
@@ -18,6 +19,8 @@ export function BroadcastHeader({
   now: Date | null;
 }) {
   const station = stations.find((s) => s.id === selected)!;
+  const audio = useAudio();
+  
   async function fullscreen() {
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
@@ -73,6 +76,22 @@ export function BroadcastHeader({
             </button>
           ))}
         </nav>
+        <button
+          className={`icon-button ${!audio.actualSoundEnabled && audio.autoplayBlocked ? "pulse-warn" : ""}`}
+          title={audio.actualSoundEnabled ? "Matikan suara" : "Aktifkan suara"}
+          aria-label={audio.actualSoundEnabled ? "Matikan suara" : "Aktifkan suara"}
+          onClick={() => {
+            if (audio.actualSoundEnabled) {
+              audio.setPreferredSoundEnabled(false);
+              audio.setActualSoundEnabled(false);
+            } else {
+              audio.setPreferredSoundEnabled(true);
+              audio.retryAudio();
+            }
+          }}
+        >
+          {audio.actualSoundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+        </button>
         <button
           className="icon-button"
           title="Layar penuh"

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Pencil, Plus } from "lucide-react";
-import { DAYS, type Schedule } from "@/data/types";
+import { type Schedule } from "@/data/types";
 import { channelName, hasStream, isCurrent } from "@/lib/broadcast";
 import { useClock } from "@/lib/use-clock";
 import { useBoardData } from "@/lib/supabase-provider";
@@ -20,6 +20,7 @@ import {
   PageHeading,
   savedMessage,
 } from "./admin-ui";
+import { formatDaysOfWeek, findScheduleConflict, normalizeDaysOfWeek } from "@/lib/board/schedule-utils";
 
 function ScheduleForm({
   item,
@@ -30,9 +31,15 @@ function ScheduleForm({
   onClose: () => void;
   onSaved: (persisted: boolean) => void;
 }) {
-  const { stations } = useBoardData();
+  const data = useBoardData();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedDays, setSelectedDays] = useState<number[]>(item ? item.daysOfWeek : [1, 2, 3, 4, 5, 6, 7]);
+
+  const toggleDay = (d: number) => {
+    setSelectedDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
+  };
+  const setPreset = (preset: number[]) => setSelectedDays(preset);
 
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -48,6 +55,10 @@ function ScheduleForm({
       );
       return;
     }
+    if (selectedDays.length === 0) {
+      setError("Pilih minimal satu hari siaran.");
+      return;
+    }
     
     setLoading(true);
     const supabase = createClient();
@@ -60,25 +71,51 @@ function ScheduleForm({
       return;
     }
     
+    const conflict = findScheduleConflict(data.schedules, {
+      id: item?.id,
+      channel: st.id,
+      daysOfWeek: selectedDays,
+      start: start,
+      end: end,
+      isActive: true
+    });
+
+    if (conflict) {
+      setError(`Jadwal tidak dapat disimpan karena bentrok dengan program '${conflict.title}' di ${conflict.stationName} pada ${formatDaysOfWeek(conflict.overlappingDays)}. Program yang sudah ada: ${conflict.startTime}–${conflict.endTime} WIB.`);
+      setLoading(false);
+      return;
+    }
+
     const dbValue = {
       station_id: st.id,
       title: program,
       start_time: start,
       end_time: end,
       presenter: String(form.get("presenter")).trim(),
-      day_of_week: String(form.get("day")),
+      days_of_week: normalizeDaysOfWeek(selectedDays),
+    };
+
+    const handleErr = (err: Error | { message: string }) => {
+      if (err.message.includes("SCHEDULE_CONFLICT|")) {
+         const parts = err.message.split("|");
+         let days = [];
+         try { days = JSON.parse(parts[3] || "[]"); } catch { /* ignore */ }
+         setError(`Jadwal tidak dapat disimpan karena bentrok dengan program '${parts[2]}' di saluran ini pada ${formatDaysOfWeek(days)}. Program yang sudah ada: ${parts[4]}–${parts[5]} WIB.`);
+      } else {
+         setError(err.message);
+      }
     };
 
     if (item) {
       const { error: err } = await supabase.from("schedules").update(dbValue).eq("id", item.id);
-      if (err) setError(err.message);
+      if (err) handleErr(err);
       else {
         onSaved(true);
         onClose();
       }
     } else {
       const { error: err } = await supabase.from("schedules").insert(dbValue);
-      if (err) setError(err.message);
+      if (err) handleErr(err);
       else {
         onSaved(true);
         onClose();
@@ -101,22 +138,33 @@ function ScheduleForm({
       <div className="form-two-columns">
         <Field label="Saluran">
           <select name="channel" defaultValue={item?.channel ?? "pro1"} disabled={loading}>
-            {stations.map((s) => (
+            {data.stations.map((s) => (
               <option key={s.id} value={s.id}>
                 {channelName(s.id)}
               </option>
             ))}
           </select>
         </Field>
-        <Field label="Hari siaran">
-          <select name="day" defaultValue={item?.day ?? "daily"} disabled={loading}>
-            <option value="daily">Setiap hari</option>
-            {DAYS.map((day, i) => (
-              <option key={day} value={i}>
-                {day}
-              </option>
-            ))}
-          </select>
+        <Field label="Pilih hari">
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap gap-2">
+              {[1, 2, 3, 4, 5, 6, 7].map((d) => (
+                <label key={d} className="flex items-center gap-1 bg-surface-container py-1 px-2 rounded cursor-pointer hover:bg-surface-container-high transition-colors text-sm">
+                  <input type="checkbox" checked={selectedDays.includes(d)} onChange={() => toggleDay(d)} disabled={loading} className="cursor-pointer" />
+                  <span>{["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"][d - 1]}</span>
+                </label>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 text-xs">
+               <span className="text-secondary">Preset:</span>
+               <button type="button" className="text-primary hover:underline" onClick={() => setPreset([1,2,3,4,5])}>Senin–Jumat</button>
+               <button type="button" className="text-primary hover:underline" onClick={() => setPreset([6,7])}>Akhir Pekan</button>
+               <button type="button" className="text-primary hover:underline" onClick={() => setPreset([1,2,3,4,5,6,7])}>Setiap Hari</button>
+            </div>
+            {selectedDays.length > 0 && (
+               <div className="text-xs text-secondary mt-1">Dipilih: <strong>{formatDaysOfWeek(selectedDays)}</strong></div>
+            )}
+          </div>
         </Field>
         <Field label="Jam mulai">
           <input
@@ -233,9 +281,7 @@ export function ScheduleManager() {
                   </td>
                   <td>{item.presenter || "—"}</td>
                   <td>
-                    {item.day === "daily"
-                      ? "Setiap hari"
-                      : DAYS[Number(item.day)]}
+                    {formatDaysOfWeek(item.daysOfWeek)}
                   </td>
                   <td>
                     {current && available ? (

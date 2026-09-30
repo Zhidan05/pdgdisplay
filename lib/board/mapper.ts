@@ -43,7 +43,7 @@ export function mapBoardData(
       end: (r.end_time as string).substring(0, 5),
       program: r.title as string,
       presenter: (r.presenter as string) || "",
-      day: (r.day_of_week as string) || "daily",
+      daysOfWeek: Array.isArray(r.days_of_week) ? (r.days_of_week as number[]) : [],
     };
   });
 
@@ -70,7 +70,7 @@ export function mapBoardData(
     stationName: "RRI PADANG",
     boardTitle: "Radio Republik Indonesia",
     timezone: "Asia/Jakarta",
-    fallbackImage: "/rri/studio.jpg",
+    fallbackImage: "",
     infoInterval: 8,
     mainImageInterval: 10,
   };
@@ -78,7 +78,12 @@ export function mapBoardData(
     if (r.key === "station_name") settingsObj.stationName = r.value as string;
     if (r.key === "board_title") settingsObj.boardTitle = r.value as string;
     if (r.key === "timezone") settingsObj.timezone = r.value as string;
-    if (r.key === "fallback_image") settingsObj.fallbackImage = r.value as string;
+    if (r.key === "fallback_image") {
+      const val = r.value as string;
+      if (val && !val.includes("studio.jpg")) {
+        settingsObj.fallbackImage = val;
+      }
+    }
     if (r.key === "info_carousel_interval") settingsObj.infoInterval = parseInt(r.value as string) || 8;
     if (r.key === "main_image_interval") settingsObj.mainImageInterval = parseInt(r.value as string) || 10;
   });

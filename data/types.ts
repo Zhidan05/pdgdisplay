@@ -19,7 +19,7 @@ export interface Schedule {
   end: string;
   program: string;
   presenter: string;
-  day: string;
+  daysOfWeek: number[];
 }
 export interface InfoItem {
   id: string;

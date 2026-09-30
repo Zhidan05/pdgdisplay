@@ -9,6 +9,7 @@ import { LiveStreamPanel } from "./live-stream-panel";
 import { LatestInfoCarousel, MainPoster } from "./info-carousel";
 import { TodaySchedule } from "./today-schedule";
 import { RunningTicker } from "./running-ticker";
+import { AudioProvider } from "./audio-context";
 
 const STATION_THEMES = {
   pro1: {
@@ -43,43 +44,45 @@ export function PublicBoard() {
   const theme = STATION_THEMES[selected] || STATION_THEMES.pro1;
   
   return (
-    <div 
-      className="public-board"
-      style={{
-        "--accent": theme.accent,
-        "--accent-soft": theme.accentSoft,
-        "--accent-muted": theme.accentMuted,
-        "--ring": theme.ring,
-      } as React.CSSProperties}
-    >
-      <BroadcastHeader
-        stations={data.stations}
-        selected={selected}
-        onSelect={setSelected}
-        settings={data.settings}
-        now={now}
-      />
-      <main className="main-board-grid">
-        <div className="board-left">
-          <LiveStreamPanel
-            station={station}
-            current={current}
-            fallbackImage={data.settings.fallbackImage}
-          />
-          <LatestInfoCarousel
-            items={data.info.filter((i) => i.display_type === "latest_info")}
-          />
-        </div>
-        <MainPoster items={data.info.filter((i) => i.display_type === "main_poster" && i.active).sort((a, b) => a.order - b.order)} />
-        <TodaySchedule
-          schedules={data.schedules}
-          station={station}
+    <AudioProvider>
+      <div 
+        className="public-board"
+        style={{
+          "--accent": theme.accent,
+          "--accent-soft": theme.accentSoft,
+          "--accent-muted": theme.accentMuted,
+          "--ring": theme.ring,
+        } as React.CSSProperties}
+      >
+        <BroadcastHeader
           stations={data.stations}
+          selected={selected}
+          onSelect={setSelected}
+          settings={data.settings}
           now={now}
-          timezone={data.settings.timezone}
         />
-      </main>
-      <RunningTicker items={data.ticker} />
-    </div>
+        <main className="main-board-grid">
+          <div className="board-left">
+            <LiveStreamPanel
+              station={station}
+              current={current}
+              fallbackImage={data.settings.fallbackImage}
+            />
+            <LatestInfoCarousel
+              items={data.info.filter((i) => i.display_type === "latest_info")}
+            />
+          </div>
+          <MainPoster items={data.info.filter((i) => i.display_type === "main_poster" && i.active).sort((a, b) => a.order - b.order)} />
+          <TodaySchedule
+            schedules={data.schedules}
+            station={station}
+            stations={data.stations}
+            now={now}
+            timezone={data.settings.timezone}
+          />
+        </main>
+        <RunningTicker items={data.ticker} />
+      </div>
+    </AudioProvider>
   );
 }

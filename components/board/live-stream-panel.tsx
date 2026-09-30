@@ -1,70 +1,347 @@
 "use client";
-import { useState } from "react";
-import { AudioLines, Mic2, VolumeX } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { AudioLines, VolumeX } from "lucide-react";
 import {
-  BroadcastStatus,
   ChannelLogo,
 } from "@/components/shared/broadcast-ui";
 import { MediaImage } from "@/components/shared/media-image";
 import { hasStream } from "@/lib/broadcast";
 import { getStreamSource } from "@/lib/media-utils";
 import type { Schedule, Station } from "@/data/types";
+import { useOptionalAudio } from "./audio-context";
+
+export type StreamRenderMode = "broadcast" | "preview";
 
 export function OfflineFallback({ image }: { image: string }) {
+  const isValidImage = image && image.trim() !== "" && !image.includes("studio.jpg");
   return (
     <div className="offline-fallback">
-      <MediaImage
-        key={image}
-        src={image}
-        alt="Gedung RRI Padang — referensi visual"
-        priority
-      />
-      <div className="offline-message">
-        <img 
-          src="/rri/rri.png" 
-          alt="RRI Logo" 
-          style={{ height: 32, width: "auto", objectFit: "contain", marginBottom: 16, filter: "brightness(0) invert(1)", opacity: 0.95 }} 
+      {isValidImage && (
+        <MediaImage
+          key={image}
+          src={image}
+          alt="Gedung RRI Padang — referensi visual"
+          priority
         />
-        <span>SELALU DEKAT DENGAN ANDA</span>
+      )}
+      <div className="offline-message">
+        <img
+          src="/rri/rri.png"
+          alt="RRI Logo"
+          style={{ height: 32, width: "auto", objectFit: "contain", marginBottom: 16, filter: "brightness(0) invert(1)", opacity: 0.95 }}
+        />
+        <span>Sekali di Udara, Tetap di Udara</span>
         <h2>Siaran sedang tidak tersedia</h2>
       </div>
     </div>
   );
 }
-function StreamMedia({ url }: { url: string }) {
+declare global {
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    YT: any;
+    onYouTubeIframeAPIReady: () => void;
+  }
+}
+
+function YouTubePlayer({ videoId, onFail, mode }: { videoId: string, onFail: () => void, mode: StreamRenderMode }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const playerRef = useRef<any>(null);
+  const audio = useOptionalAudio();
+  const initTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isPreview = mode === "preview" || !audio;
+
+  // Initialize player ONLY ONCE when component mounts
+  useEffect(() => {
+    let isMounted = true;
+    
+    if (!containerRef.current) return;
+    // Create an inner div for YouTube to replace, isolating it from React's DOM management
+    containerRef.current.innerHTML = '<div></div>';
+    const targetDiv = containerRef.current.firstElementChild as HTMLElement;
+
+    function initPlayer() {
+      if (!isMounted || playerRef.current) return;
+      playerRef.current = new window.YT.Player(targetDiv, {
+        videoId: videoId,
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          modestbranding: 1,
+          playsinline: 1,
+          rel: 0,
+          mute: isPreview ? 1 : (audio.preferredSoundEnabled ? 0 : 1)
+        },
+        events: {
+          onReady: onPlayerReady,
+          onStateChange: onPlayerStateChange,
+          onError: onFail
+        }
+      });
+    }
+
+    if (!window.YT) {
+      let script = document.getElementById("youtube-api-script") as HTMLScriptElement;
+      if (!script) {
+        script = document.createElement("script");
+        script.id = "youtube-api-script";
+        script.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode?.insertBefore(script, firstScriptTag);
+      }
+      
+      const originalReady = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => {
+        if (originalReady) originalReady();
+        if (isMounted) initPlayer();
+      };
+    } else if (window.YT && window.YT.Player) {
+      initPlayer();
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function onPlayerReady(event: any) {
+      if (!isMounted) return;
+      const player = event.target;
+      
+      if (isPreview) {
+        player.mute();
+        return;
+      }
+      
+      player.setVolume(audio.volume);
+      
+      if (audio.preferredSoundEnabled) {
+        player.unMute();
+        player.playVideo();
+        
+        initTimeoutRef.current = setTimeout(() => {
+          if (isMounted && player.getPlayerState() !== 1 && player.getPlayerState() !== 3) {
+             audio.setAutoplayBlocked(true);
+             audio.setActualSoundEnabled(false);
+             player.mute();
+             player.playVideo();
+          }
+        }, 1500);
+      } else {
+        player.mute();
+        player.playVideo();
+        audio.setActualSoundEnabled(false);
+      }
+      
+      audio.registerRetryCallback(() => {
+        if (!isMounted) return;
+        if (player && player.unMute) {
+          player.unMute();
+          player.setVolume(audio.volume);
+          player.playVideo();
+          // Check state after programmatic unmute
+          setTimeout(() => {
+            if (isMounted && player && typeof player.isMuted === 'function') {
+               audio.setActualSoundEnabled(!player.isMuted());
+               if (!player.isMuted()) audio.setAutoplayBlocked(false);
+            }
+          }, 100);
+        }
+      });
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function onPlayerStateChange(event: any) {
+      if (!isMounted || isPreview) return;
+      if (event.data === 1) { // PLAYING
+         const player = event.target;
+         if (player.isMuted()) {
+            audio.setActualSoundEnabled(false);
+         } else {
+            audio.setActualSoundEnabled(true);
+            audio.setAutoplayBlocked(false);
+            if (initTimeoutRef.current) clearTimeout(initTimeoutRef.current);
+         }
+      }
+    }
+
+    return () => {
+       isMounted = false;
+       if (initTimeoutRef.current) clearTimeout(initTimeoutRef.current);
+       try {
+         if (playerRef.current && typeof playerRef.current.destroy === 'function') {
+            playerRef.current.destroy();
+         }
+       } catch {
+         // ignore external player teardown errors
+       }
+       playerRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run ONLY once to mount the player
+
+  // Handle videoId updates without recreating the player
+  useEffect(() => {
+    if (playerRef.current && typeof playerRef.current.loadVideoById === 'function') {
+      playerRef.current.loadVideoById(videoId);
+    }
+  }, [videoId]);
+
+  // Update volume and mute state dynamically if user changes it via context
+  useEffect(() => {
+    if (isPreview) return;
+    if (playerRef.current && typeof playerRef.current.setVolume === 'function') {
+      playerRef.current.setVolume(audio.volume);
+      if (audio.preferredSoundEnabled) {
+        playerRef.current.unMute();
+        // Verify if unmute was successful (browser might still block if no interaction)
+        setTimeout(() => {
+          if (playerRef.current && typeof playerRef.current.isMuted === 'function') {
+             const muted = playerRef.current.isMuted();
+             audio.setActualSoundEnabled(!muted);
+             if (muted) audio.setAutoplayBlocked(true);
+          }
+        }, 100);
+      } else {
+        playerRef.current.mute();
+        audio.setActualSoundEnabled(false);
+      }
+    }
+  }, [audio?.preferredSoundEnabled, audio?.volume, isPreview]);
+
+  return <div ref={containerRef} className="stream-video" />;
+}
+
+function HtmlVideoPlayer({ url, onFail, mode }: { url: string, onFail: () => void, mode: StreamRenderMode }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const audio = useOptionalAudio();
+  const isPreview = mode === "preview" || !audio;
+
+  useEffect(() => {
+    let isMounted = true;
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isPreview) {
+      video.muted = true;
+      video.play().catch(() => {});
+      return;
+    }
+
+    video.volume = audio.volume / 100;
+    
+    const playWithAudio = async () => {
+      if (audio.preferredSoundEnabled) {
+        video.muted = false;
+        try {
+          await video.play();
+          if (isMounted) {
+            audio.setActualSoundEnabled(true);
+            audio.setAutoplayBlocked(false);
+          }
+        } catch (err) {
+          if (err instanceof DOMException && err.name === 'NotAllowedError') {
+            video.muted = true;
+            if (isMounted) {
+              audio.setActualSoundEnabled(false);
+              audio.setAutoplayBlocked(true);
+            }
+            try {
+              await video.play();
+            } catch {
+              // ignore
+            }
+          }
+        }
+      } else {
+        video.muted = true;
+        try {
+          await video.play();
+          if (isMounted) audio.setActualSoundEnabled(false);
+        } catch {
+          // ignore
+        }
+      }
+    };
+
+    playWithAudio();
+
+    audio.registerRetryCallback(() => {
+      if (!isMounted) return;
+      video.muted = false;
+      video.volume = audio.volume / 100;
+      video.play().then(() => {
+         if (isMounted) {
+           audio.setActualSoundEnabled(true);
+           audio.setAutoplayBlocked(false);
+         }
+      }).catch(() => {
+         video.muted = true;
+         if (isMounted) {
+           audio.setActualSoundEnabled(false);
+           audio.setAutoplayBlocked(true);
+         }
+      });
+    });
+
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url]); // Only run once on mount or url change
+
+  useEffect(() => {
+    if (isPreview) return;
+    const video = videoRef.current;
+    if (video) {
+       video.volume = audio.volume / 100;
+       if (audio.preferredSoundEnabled) {
+         video.muted = false;
+         video.play().then(() => {
+            audio.setActualSoundEnabled(true);
+            audio.setAutoplayBlocked(false);
+         }).catch(() => {
+            video.muted = true;
+            audio.setActualSoundEnabled(false);
+            audio.setAutoplayBlocked(true);
+         });
+       } else {
+         video.muted = true;
+         audio.setActualSoundEnabled(false);
+       }
+    }
+  }, [audio?.volume, audio?.preferredSoundEnabled, isPreview]);
+
+  return (
+    <video
+      ref={videoRef}
+      className="stream-video"
+      src={url}
+      loop
+      playsInline
+      onError={onFail}
+      aria-label="Video siaran"
+    />
+  );
+}
+
+function StreamMedia({ url, mode }: { url: string, mode: StreamRenderMode }) {
   const [failed, setFailed] = useState(false);
+  const [prevUrl, setPrevUrl] = useState(url);
+
+  if (url !== prevUrl) {
+    setPrevUrl(url);
+    setFailed(false);
+  }
+
   const source = getStreamSource(url);
-  
+
   return (
     <>
-      <MediaImage
-        src="/rri/studio.jpg"
-        alt="Pratinjau studio siaran RRI Padang"
-        priority
-      />
       {!failed && source?.type === "youtube" && (
-        <iframe
-          className="stream-video"
-          src={source.embedUrl}
-          allow="autoplay; encrypted-media"
-          allowFullScreen
-          title="YouTube Live Stream"
-          onError={() => setFailed(true)}
-        />
+        <YouTubePlayer videoId={source.videoId} onFail={() => setFailed(true)} mode={mode} />
       )}
       {!failed && (source?.type === "video" || source?.type === "unknown") && (
-        <video
-          className="stream-video"
-          src={source.url}
-          poster="/rri/studio.jpg"
-          autoPlay
-          muted
-          loop
-          playsInline
-          controls
-          onError={() => setFailed(true)}
-          aria-label="Video siaran"
-        />
+        <HtmlVideoPlayer url={source.url} onFail={() => setFailed(true)} mode={mode} />
       )}
       {failed && <span className="media-notice">Pratinjau belum tersedia</span>}
     </>
@@ -75,11 +352,13 @@ export function LiveStreamPanel({
   current,
   fallbackImage,
   compact = false,
+  mode,
 }: {
   station: Station;
   current?: Schedule;
   fallbackImage: string;
   compact?: boolean;
+  mode?: StreamRenderMode;
 }) {
   const available = hasStream(station.streamUrl);
   return (
@@ -89,32 +368,20 @@ export function LiveStreamPanel({
     >
       <div className="live-media">
         {available ? (
-          <StreamMedia key={station.streamUrl} url={station.streamUrl!} />
+          <StreamMedia url={station.streamUrl!} mode={mode || "broadcast"} />
         ) : (
           <OfflineFallback image={fallbackImage} />
         )}
         <div className="live-top">
-          <ChannelLogo channel={station.id} />
-          {/* Badge moved to corner of the stream, or keep it here but we want it cleaner */}
-          <BroadcastStatus available={available} />
-        </div>
-        {available && (
-          <div className="live-caption">
-            <span>
-              <AudioLines size={15} />
-              {station.streamUrl === "/media/studio-demo.webm"
-                ? "PRATINJAU DEMO"
-                : "SIARAN LANGSUNG"}
-            </span>
-            {current && <h2>{current.program}</h2>}
-            {current?.presenter && (
-              <p>
-                <Mic2 size={14} />
-                {current.presenter}
-              </p>
+          <div className="flex flex-col items-center gap-1.5 drop-shadow-md">
+            <ChannelLogo channel={station.id} />
+            {available && (
+              <span className="text-[11px] font-bold tracking-[0.2em] text-white uppercase" style={{ textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}>
+                LIVE
+              </span>
             )}
           </div>
-        )}
+        </div>
       </div>
       <div className="live-footer">
         <span>
