@@ -10,11 +10,12 @@
 - Consistent save/loading/error feedback across all admin forms.
 
 ### Changed
+- Removed the white background container from the PRO channel logo exclusively within the stream overlay (`.live-top`), replacing it with a drop-shadow so the logo remains visible without obscuring the video.
+- Synchronized the streaming overlay title strictly with the currently active schedule. The title (and presenter) will now only appear if a matching schedule exists for the selected channel and current time, removing the hardcoded fallback "Bersama RRI Padang" to ensure absolute data accuracy.
+- Drastically simplified the stream overlay for both ON AIR and OFF AIR states by stripping away heavy translucent background panels and dim layers, relying instead on clean typography with crisp text-shadows and ultra-light bottom gradients. This maximizes the visibility of the stream/poster content.
 - Replaced the generic radio icon on the OFF AIR overlay with the official RRI logo, treated with a white monochrome filter (`brightness(0) invert(1)`) to maintain contrast and elegance.
 - Refined the PRO channel cards (in the header and schedule panel) by using a pure white background for the logo and frequency container, ensuring maximum contrast and readability for black frequency text.
 - Implemented dynamic accent colors across the public Info Board based on the currently active PRO channel, applied smoothly using CSS variables and root context injection.
-- Redesigned the ON AIR streaming overlay to be more minimalist, with a refined bottom gradient and cleaner layout to avoid obscuring visual content.
-- Redesigned the OFF AIR fallback screen into a centered translucent card with subtle background dimming, removing the massive dark panel blocking the fallback image.
 - Standardized broadcast status badges to be more rounded, compact, and perfectly integrated with dynamic channel accents.
 - Refactored Info Terbaru to exclude Main Poster into a dedicated Gambar Utama management page.
 - Removed the strict 4:5 aspect ratio constraint for Gambar Utama. It now automatically preserves the natural aspect ratio without cropping (`object-fit: contain`) while adding a subtle blurred backdrop of the same image to prevent empty gaps on wide/tall screens.

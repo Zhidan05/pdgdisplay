@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { AudioLines, Mic2, Radio, VolumeX } from "lucide-react";
+import { AudioLines, Mic2, VolumeX } from "lucide-react";
 import {
   BroadcastStatus,
   ChannelLogo,
@@ -23,15 +23,10 @@ export function OfflineFallback({ image }: { image: string }) {
         <img 
           src="/rri/rri.png" 
           alt="RRI Logo" 
-          style={{ height: 26, width: "auto", objectFit: "contain", marginBottom: 14, filter: "brightness(0) invert(1)", opacity: 0.85 }} 
+          style={{ height: 32, width: "auto", objectFit: "contain", marginBottom: 16, filter: "brightness(0) invert(1)", opacity: 0.95 }} 
         />
         <span>SELALU DEKAT DENGAN ANDA</span>
         <h2>Siaran sedang tidak tersedia</h2>
-        <p>
-          Kami akan kembali menemani Anda.
-          <br />
-          Tetap bersama RRI Padang.
-        </p>
       </div>
     </div>
   );
@@ -111,7 +106,7 @@ export function LiveStreamPanel({
                 ? "PRATINJAU DEMO"
                 : "SIARAN LANGSUNG"}
             </span>
-            <h2>{current?.program ?? "Bersama RRI Padang"}</h2>
+            {current && <h2>{current.program}</h2>}
             {current?.presenter && (
               <p>
                 <Mic2 size={14} />

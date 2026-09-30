@@ -414,13 +414,26 @@
   .live-top .broadcast-status {
     background: #03111fe6;
   }
+  .live-top .channel-logo-container {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+  .live-top .channel-img {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+  }
   .live-caption {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 40px 20px 20px;
-    background: linear-gradient(to bottom, transparent, rgba(3, 17, 31, 0.95));
+    padding: 50px 20px 20px;
+    background: transparent !important;
+    background-image: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    border: none;
     pointer-events: none;
     z-index: 2;
   }
@@ -431,17 +444,21 @@
     letter-spacing: 1.5px;
     font-weight: 650;
     transition: color 300ms ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.65);
   }
   .live-caption h2 {
     font-size: clamp(18px, 1.5vw, 26px);
     font-weight: 750;
     line-height: 1.2;
     margin: 4px 0;
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.65);
   }
   .live-caption p {
     @apply flex items-center gap-2;
     color: #d4dde7;
     font-size: 12px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.65);
   }
   .live-footer {
     @apply flex items-center justify-between gap-3;
@@ -472,46 +489,37 @@
     position: absolute;
     inset: 0;
   }
-  .offline-fallback::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: #020c1750;
-  }
   .offline-message {
     position: absolute;
     z-index: 1;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: 24px 32px;
-    border: 1px solid var(--border-subtle);
-    background: rgba(7, 24, 39, 0.85);
-    backdrop-filter: blur(8px);
-    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     text-align: center;
-    width: auto;
-    max-width: 80%;
+    width: 100%;
+    padding: 20px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.85);
   }
-  .offline-message > svg {
-    color: var(--accent);
-    margin-bottom: 10px;
-    transition: color 300ms ease;
+  .offline-message > img {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)) brightness(0) invert(1);
   }
   .offline-message > span {
-    font-size: 9px;
+    font-size: 10px;
     color: var(--accent);
     letter-spacing: 1.5px;
+    font-weight: 700;
     transition: color 300ms ease;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.9);
   }
   .offline-message h2 {
-    font-size: clamp(15px, 1.2vw, 20px);
+    font-size: clamp(16px, 1.4vw, 22px);
     font-weight: 700;
-    margin: 8px 0;
+    margin: 8px 0 4px;
+    color: #ffffff;
   }
   .offline-message p {
     font-size: 12px;
