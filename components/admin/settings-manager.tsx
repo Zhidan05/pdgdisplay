@@ -38,6 +38,8 @@ export function SettingsManager() {
       fallbackImage: String(form.get("fallbackImage")).trim(),
       infoInterval: Number(form.get("infoInterval")),
       mainImageInterval: Number(form.get("mainImageInterval")),
+      addressLine1: String(form.get("addressLine1")).trim(),
+      addressLine2: String(form.get("addressLine2")).trim(),
     };
     if (
       !value.boardTitle
@@ -77,6 +79,8 @@ export function SettingsManager() {
       { key: "fallback_image", value: imageUrl },
       { key: "info_carousel_interval", value: value.infoInterval.toString() },
       { key: "main_image_interval", value: value.mainImageInterval.toString() },
+      { key: "address_line_1", value: value.addressLine1 },
+      { key: "address_line_2", value: value.addressLine2 },
     ];
     
     const { error: err } = await supabase.from("settings").upsert(updates, { onConflict: "key" });
@@ -123,6 +127,22 @@ export function SettingsManager() {
                 name="boardTitle"
                 defaultValue={settings.boardTitle}
                 required
+                maxLength={60}
+                disabled={loading}
+              />
+            </Field>
+            <Field label="Alamat baris 1">
+              <input
+                name="addressLine1"
+                defaultValue={settings.addressLine1}
+                maxLength={60}
+                disabled={loading}
+              />
+            </Field>
+            <Field label="Alamat baris 2">
+              <input
+                name="addressLine2"
+                defaultValue={settings.addressLine2}
                 maxLength={60}
                 disabled={loading}
               />

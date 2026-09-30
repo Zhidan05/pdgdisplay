@@ -31,36 +31,51 @@ export function BroadcastHeader({
   }
   return (
     <header className="broadcast-header">
-      <RriBrand name={settings.stationName} subtitle={settings.boardTitle} />
-      <div className="board-date">
-        <span>
-          {now
-            ? now.toLocaleDateString("id-ID", {
-                timeZone: settings.timezone,
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })
-            : "Memuat tanggal…"}
-        </span>
-        <time>
-          {now
-            ? now.toLocaleTimeString("en-GB", {
-                timeZone: settings.timezone,
-                hourCycle: "h23",
-              })
-            : "--:--:--"}
-        </time>
-        <small>
-          {settings.timezone === "Asia/Jakarta"
-            ? "WIB"
-            : settings.timezone === "Asia/Makassar"
-              ? "WITA"
-              : settings.timezone === "Asia/Jayapura"
-                ? "WIT"
-                : settings.timezone}
-        </small>
+      <RriBrand 
+        name={settings.addressLine1 || "Alamat belum diatur"} 
+        subtitle={settings.addressLine2 || "Silakan atur di Pengaturan"} 
+      />
+      <div className="board-time-container">
+        <div className="board-date-block">
+          <span className="day-name">
+            {now
+              ? now.toLocaleDateString("id-ID", {
+                  timeZone: settings.timezone,
+                  weekday: "long",
+                }).toUpperCase()
+              : "MEMUAT..."}
+          </span>
+          <span className="full-date">
+            {now
+              ? now.toLocaleDateString("id-ID", {
+                  timeZone: settings.timezone,
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                }).toUpperCase()
+              : "TANGGAL"}
+          </span>
+        </div>
+        <div className="time-divider" />
+        <div className="board-time-block">
+          <time>
+            {now
+              ? now.toLocaleTimeString("en-GB", {
+                  timeZone: settings.timezone,
+                  hourCycle: "h23",
+                })
+              : "--:--:--"}
+          </time>
+          <span className="time-zone">
+            {settings.timezone === "Asia/Jakarta"
+              ? "WIB"
+              : settings.timezone === "Asia/Makassar"
+                ? "WITA"
+                : settings.timezone === "Asia/Jayapura"
+                  ? "WIT"
+                  : settings.timezone}
+          </span>
+        </div>
       </div>
       <div className="header-channels">
         <BroadcastStatus available={hasStream(station.streamUrl)} />

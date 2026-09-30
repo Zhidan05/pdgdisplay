@@ -51,6 +51,13 @@ Poster, thumbnail, dan media informasi tidak boleh terasa seperti elemen sekunde
 
 ## 2.4 Desktop / TV First
 
+PUBLIC INFO BOARD CANONICAL TARGET: 1920×1080 fullscreen.
+
+When responsive tradeoffs occur, fullscreen layout takes priority over windowed layout.
+- Main Poster container must enforce exact 4:5 ratio based on available height.
+- Grid adapts around the poster.
+- No letterboxing or blurred backgrounds for new uploads.
+
 Target utama:
 
 - Public board: **1920 × 1080**
@@ -271,21 +278,36 @@ Header harus compact.
 
 Urutan kiri ke kanan:
 
+Urutan kiri ke kanan:
+
 1. RRI logo
-2. Radio Republik Indonesia
-3. Hari
-4. Tanggal
-5. Jam digital
+2. Alamat baris 1
+3. Alamat baris 2
+4. Hari, Tanggal (Blok Kiri)
+5. Jam digital, Zona waktu (Blok Kanan)
 6. Broadcast status
 7. PRO 1
 8. PRO 2
 9. PRO 4
 10. Utility actions bila diperlukan
 
+Date & Time Layout: DUA block sibling dengan ukuran visual sama. 
+Hari + tanggal: LEFT. 
+Jam: RIGHT. 
+Equal width, equal height, aligned vertically.
+Pemisah mengandalkan spacing, alignment, atau 1px subtle divider.
+TIDAK MENGGUNAKAN panel background tambahan, border, card, atau rounded rectangle.
+
 Contoh:
 
 ```txt
-RRI | SELASA 29 SEPTEMBER 2026 | 15:44:55 | ON AIR | PRO 1 | PRO 2 | PRO 4
+[RRI LOGO] | Jl. Jenderal Sudirman No. 12
+             Padang, Sumatera Barat
+```
+
+```txt
+RABU             | 19:40:25
+30 SEPTEMBER 2026| WIB
 ```
 
 ## Channel State
@@ -432,23 +454,34 @@ Contoh penggunaan:
 
 HILANGKAN:
 
+HILANGKAN:
+
 - label `INFO TERBARU`,
 - judul di bawah poster,
 - caption,
 - deskripsi,
 - kategori,
 - tanggal,
-- metadata lainnya.
+- metadata lainnya,
+- blurred backdrop,
+- duplicate blurred image.
 
 Poster harus menjadi elemen visual utama.
 
-Gunakan:
-
+Container Gambar Utama WAJIB:
 ```css
-object-fit: contain;
+aspect-ratio: 4 / 5;
 ```
 
-Jangan crop poster jika tidak diperlukan.
+Image WAJIB:
+```css
+width: 100%;
+height: 100%;
+object-fit: cover;
+```
+
+Tidak boleh ada: letterbox, pillarbox, atau blank space. Display menggunakan `object-fit: cover` sebagai fallback.
+Upload admin mewajibkan cropping 4:5 jika rasio awal tidak sesuai.
 
 Container harus menggunakan area sebanyak mungkin.
 
@@ -539,9 +572,18 @@ Carousel boleh menggunakan:
 
 ---
 
-# 14. Jadwal Hari Ini
+## 14. Jadwal Hari Ini
 
 Kolom kanan digunakan untuk program hari ini.
+
+Tampilkan TIGA section jadwal secara bersamaan: 
+- PRO 1
+- PRO 2
+- PRO 4
+
+Setiap section menampilkan MAKSIMAL 2 JADWAL (1 Current + 1 Next, atau 2 Next).
+Tidak ada scrolling/overflow pada jadwal.
+Navigasi channel atas tetap berfungsi TAPI hanya untuk mengubah target live stream (audio), tidak mengubah section Jadwal Hari Ini.
 
 Heading:
 
@@ -556,16 +598,21 @@ Setiap schedule item menampilkan:
 - penyiar,
 - rentang waktu.
 
+Identitas stasiun pada panel jadwal (PRO 1, PRO 2, PRO 4) ditampilkan langsung menggunakan logo dan frekuensi, TANPA background kotak putih/card/container. Navigasi channel di Header utama TETAP mempertahankan gaya tombol/box-nya.
+
 Contoh:
 
 ```txt
+[PRO 1 LOGO] 95.9 FM
+---------------------
 14:00
-
 Musik Nusantara
 Penyiar: Rina
-
 14:00 – 16:00 WIB
 ON AIR
+
+16:00
+Pro 1 RRI — Sore Ini
 ```
 
 ## Current Program
@@ -578,7 +625,7 @@ Program aktif memiliki:
 
 Program berikutnya lebih neutral.
 
-UI harus cukup padat agar dapat menampilkan beberapa program sekaligus.
+UI harus padat karena menampilkan jadwal untuk ketiga PRO channel tanpa scrolling.
 
 ---
 

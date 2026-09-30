@@ -2,6 +2,26 @@
 
 ## [Unreleased]
 
+### Fixed — 2026-09-30 20:07 WIB
+
+- Fixed Gambar Utama container geometry so the rendered poster remains true 4:5 instead of inheriting an arbitrary center-column ratio.
+- Prioritized the 1920×1080 fullscreen digital-signage layout and made surrounding columns adapt around the poster.
+- Fixed fullscreen/windowed reflow differences while preserving the fixed 4:5 Main Poster ratio.
+
+### Changed — 2026-09-30 20:03 WIB
+
+- Removed the boxed/card treatment from the public header date and clock, keeping them as balanced side-by-side information blocks.
+- Simplified PRO identity headers inside Jadwal Hari Ini by displaying channel logos and frequencies directly without white containers.
+
+### Added — 2026-09-30 19:50 WIB
+- Added `addressLine1` and `addressLine2` to Settings, allowing the public header to display the RRI address in 2 lines instead of "RRI PADANG / INFO BOARD".
+- Implemented `react-easy-crop` in the Admin Gambar Utama panel to strictly enforce a 4:5 (Instagram Portrait) aspect ratio, ensuring no blank spaces or letterboxes on the public board.
+- Updated Today Schedule to display all 3 PRO channels (PRO 1, PRO 2, PRO 4) simultaneously on the public board, each showing a maximum of 2 upcoming/current programs.
+
+### Changed — 2026-09-30 19:50 WIB
+- Changed the public board header Date and Time layout to two vertically aligned sibling blocks of equal visual weight.
+- Enforced `aspect-ratio: 4/5` and `object-fit: cover` on the Main Poster display, removing the blurred backdrop and duplicate image strategy.
+
 ### Fixed — 2026-09-30 19:37 WIB
 - Fixed functional broadcast motion being disabled on systems reporting `prefers-reduced-motion: reduce`.
 - Running Text now continues moving on dedicated display systems while respecting reduced decorative transitions.

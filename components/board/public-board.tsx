@@ -75,7 +75,6 @@ export function PublicBoard() {
           <MainPoster items={data.info.filter((i) => i.display_type === "main_poster" && i.active).sort((a, b) => a.order - b.order)} />
           <TodaySchedule
             schedules={data.schedules}
-            station={station}
             stations={data.stations}
             now={now}
             timezone={data.settings.timezone}

@@ -1,0 +1,177 @@
+﻿
+Running 6 tests using 1 worker
+
+  ok 1 tests\board.spec.ts:5:5 ΓÇ║ schedule boundaries use the configured timezone and previous day for overnight shows (15ms)
+  x  2 tests\board.spec.ts:36:7 ΓÇ║ public board fits 1920├ù1080, all four ratios and stream states (5.9s)
+  x  3 tests\board.spec.ts:36:7 ΓÇ║ public board fits 1366├ù768, all four ratios and stream states (6.1s)
+  x  4 tests\board.spec.ts:134:5 ΓÇ║ all admin routes render without browser errors or desktop overflow (5.8s)
+  x  5 tests\board.spec.ts:170:5 ΓÇ║ admin CRUD persists and synchronizes to an open public board (1.0m)
+  x  6 tests\board.spec.ts:311:5 ΓÇ║ invalid saved data recovers; storage failure is reported without losing the session edit (1.0m)
+
+
+  1) tests\board.spec.ts:36:7 ΓÇ║ public board fits 1920├ù1080, all four ratios and stream states ΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: locator('.schedule-item.current')
+    Expected substring: "Musik Nusantara"
+    Received string:    "15:00 ΓÇô 16:00PRO 1Dinamika OlahragaRio PratamaPROGRAM SAAT INI"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" locator('.schedule-item.current') with timeout 5000ms
+      - waiting for locator('.schedule-item.current')
+        8 ├ù locator resolved to <article class="schedule-item current">ΓÇª</article>
+          - unexpected value "15:00 ΓÇô 16:00PRO 1Dinamika OlahragaRio PratamaPROGRAM SAAT INI"
+
+
+      46 |     });
+      47 |     await page.goto("/");
+    > 48 |     await expect(page.locator(".schedule-item.current")).toContainText(
+         |                                                          ^
+      49 |       "Musik Nusantara",
+      50 |     );
+      51 |     await expect(
+        at C:\laragon\www\pdgdisplay\tests\board.spec.ts:48:58
+
+    Error Context: test-results\board-public-board-fits-19-ac1a6-ur-ratios-and-stream-states\error-context.md
+
+    attachment #2: trace (application/zip) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\board-public-board-fits-19-ac1a6-ur-ratios-and-stream-states\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\board-public-board-fits-19-ac1a6-ur-ratios-and-stream-states\trace.zip
+
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  2) tests\board.spec.ts:36:7 ΓÇ║ public board fits 1366├ù768, all four ratios and stream states ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: locator('.schedule-item.current')
+    Expected substring: "Musik Nusantara"
+    Received string:    "15:00 ΓÇô 16:00PRO 1Dinamika OlahragaRio PratamaPROGRAM SAAT INI"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" locator('.schedule-item.current') with timeout 5000ms
+      - waiting for locator('.schedule-item.current')
+        8 ├ù locator resolved to <article class="schedule-item current">ΓÇª</article>
+          - unexpected value "15:00 ΓÇô 16:00PRO 1Dinamika OlahragaRio PratamaPROGRAM SAAT INI"
+
+
+      46 |     });
+      47 |     await page.goto("/");
+    > 48 |     await expect(page.locator(".schedule-item.current")).toContainText(
+         |                                                          ^
+      49 |       "Musik Nusantara",
+      50 |     );
+      51 |     await expect(
+        at C:\laragon\www\pdgdisplay\tests\board.spec.ts:48:58
+
+    Error Context: test-results\board-public-board-fits-13-0d397-ur-ratios-and-stream-states\error-context.md
+
+    attachment #2: trace (application/zip) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\board-public-board-fits-13-0d397-ur-ratios-and-stream-states\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\board-public-board-fits-13-0d397-ur-ratios-and-stream-states\trace.zip
+
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  3) tests\board.spec.ts:134:5 ΓÇ║ all admin routes render without browser errors or desktop overflow 
+
+    Error: expect(locator).not.toContainText(expected) failed
+
+    Locator: locator('.admin-header')
+    Expected substring: not "--:--:--"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "not toContainText" locator('.admin-header') with timeout 5000ms
+      - waiting for locator('.admin-header')
+
+
+      152 |     await page.goto(`/admin/${route}`);
+      153 |     await expect(page.locator("h1")).toBeVisible();
+    > 154 |     await expect(page.locator(".admin-header")).not.toContainText("--:--:--");
+          |                                                     ^
+      155 |     expect(
+      156 |       await page.evaluate(() => document.documentElement.scrollWidth),
+      157 |     ).toBe(1440);
+        at C:\laragon\www\pdgdisplay\tests\board.spec.ts:154:53
+
+    Error Context: test-results\board-all-admin-routes-ren-cf483--errors-or-desktop-overflow\error-context.md
+
+    attachment #2: trace (application/zip) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\board-all-admin-routes-ren-cf483--errors-or-desktop-overflow\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\board-all-admin-routes-ren-cf483--errors-or-desktop-overflow\trace.zip
+
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  4) tests\board.spec.ts:170:5 ΓÇ║ admin CRUD persists and synchronizes to an open public board ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+    Test timeout of 60000ms exceeded.
+
+    Error: locator.fill: Test timeout of 60000ms exceeded.
+    Call log:
+      - waiting for locator('.stream-settings').first().getByLabel('Stream URL')
+
+
+      178 |   await page.goto("/admin/streaming");
+      179 |   const stream = page.locator(".stream-settings").first();
+    > 180 |   await stream.getByLabel("Stream URL").fill("");
+          |                                         ^
+      181 |   await stream.getByRole("button", { name: "Simpan PRO 1" }).click();
+      182 |   await expect(stream.getByRole("status")).toContainText("tersimpan");
+      183 |   await expect(board.locator(".broadcast-header .broadcast-status")).toHaveText(
+        at C:\laragon\www\pdgdisplay\tests\board.spec.ts:180:41
+
+    Error Context: test-results\board-admin-CRUD-persists--850c2-zes-to-an-open-public-board\error-context.md
+
+    attachment #2: trace (application/zip) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\board-admin-CRUD-persists--850c2-zes-to-an-open-public-board\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\board-admin-CRUD-persists--850c2-zes-to-an-open-public-board\trace.zip
+
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  5) tests\board.spec.ts:311:5 ΓÇ║ invalid saved data recovers; storage failure is reported without losing the session edit 
+
+    Test timeout of 60000ms exceeded.
+
+    Error: locator.fill: Test timeout of 60000ms exceeded.
+    Call log:
+      - waiting for getByLabel('Alamat baris 1')
+
+
+      316 |   );
+      317 |   await page.goto("/admin/settings");
+    > 318 |   await page.getByLabel("Alamat baris 1").fill("SESSION ONLY");
+          |                                           ^
+      319 |   await page.getByRole("button", { name: "Simpan pengaturan" }).click();
+      320 |   await expect(page.getByRole("status")).toContainText("untuk sesi ini");
+      321 |   await expect(page.locator(".brand-type strong")).toHaveText("SESSION ONLY");
+        at C:\laragon\www\pdgdisplay\tests\board.spec.ts:318:43
+
+    Error Context: test-results\board-invalid-saved-data-r-9e86f-out-losing-the-session-edit\error-context.md
+
+    attachment #2: trace (application/zip) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    test-results\board-invalid-saved-data-r-9e86f-out-losing-the-session-edit\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\board-invalid-saved-data-r-9e86f-out-losing-the-session-edit\trace.zip
+
+    ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+
+  5 failed
+    tests\board.spec.ts:36:7 ΓÇ║ public board fits 1920├ù1080, all four ratios and stream states ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    tests\board.spec.ts:36:7 ΓÇ║ public board fits 1366├ù768, all four ratios and stream states ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    tests\board.spec.ts:134:5 ΓÇ║ all admin routes render without browser errors or desktop overflow ΓöÇ
+    tests\board.spec.ts:170:5 ΓÇ║ admin CRUD persists and synchronizes to an open public board ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+    tests\board.spec.ts:311:5 ΓÇ║ invalid saved data recovers; storage failure is reported without losing the session edit 
+  1 passed (2.4m)

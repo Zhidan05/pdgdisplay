@@ -6,4 +6,6 @@ export const settings: Settings = {
   fallbackImage: "/images/fallback/office.jpg",
   infoInterval: 8,
   mainImageInterval: 10,
+  addressLine1: "Jl. Jenderal Sudirman No. 12",
+  addressLine2: "Padang, Sumatera Barat",
 };

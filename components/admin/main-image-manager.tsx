@@ -6,6 +6,7 @@ import { useBoardData } from "@/lib/supabase-provider";
 import { createClient } from "@/util/supabase/client";
 import { MediaImage } from "@/components/shared/media-image";
 import { EmptyState } from "@/components/shared/broadcast-ui";
+import Cropper from 'react-easy-crop';
 import { uploadImageToSupabase, deleteStorageFile } from "@/lib/media-utils";
 import {
   DeleteButton,
@@ -16,6 +17,105 @@ import {
   PageHeading,
   savedMessage,
 } from "./admin-ui";
+
+const checkImageDimensions = (file: File): Promise<{width: number, height: number, url: string}> => {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      resolve({ width: img.width, height: img.height, url });
+    };
+    img.src = url;
+  });
+};
+
+async function getCroppedImg(
+  imageSrc: string,
+  pixelCrop: { x: number; y: number; width: number; height: number },
+  targetWidth = 1080,
+  targetHeight = 1350
+): Promise<File> {
+  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = imageSrc;
+  });
+  
+  const canvas = document.createElement("canvas");
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
+  const ctx = canvas.getContext("2d")!;
+  
+  ctx.drawImage(
+    image,
+    pixelCrop.x,
+    pixelCrop.y,
+    pixelCrop.width,
+    pixelCrop.height,
+    0,
+    0,
+    targetWidth,
+    targetHeight
+  );
+  
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error("Canvas is empty"));
+        return;
+      }
+      resolve(new File([blob], "cropped.webp", { type: "image/webp" }));
+    }, "image/webp", 0.85);
+  });
+}
+
+export function ImageCropper({
+  image,
+  onCropDone,
+  onCancel
+}: {
+  image: string,
+  onCropDone: (croppedFile: File) => void,
+  onCancel: () => void
+}) {
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<{ x: number, y: number, width: number, height: number } | null>(null)
+
+  return (
+    <div className="cropper-modal" style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.85)', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ padding: '16px', background: '#000', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h3 style={{ margin: 0, fontSize: '18px' }}>Atur Potongan Gambar (4:5)</h3>
+        <button onClick={onCancel} style={{ background: 'transparent', color: 'white', border: 'none', cursor: 'pointer', fontSize: '24px' }}>&times;</button>
+      </div>
+      <div style={{ position: 'relative', flex: 1 }}>
+        <Cropper
+          image={image}
+          crop={crop}
+          zoom={zoom}
+          aspect={4 / 5}
+          onCropChange={setCrop}
+          onCropComplete={(croppedArea, croppedAreaPixels) => setCroppedAreaPixels(croppedAreaPixels)}
+          onZoomChange={setZoom}
+        />
+      </div>
+      <div style={{ padding: '20px', background: '#111', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ color: 'white' }}>Zoom</span>
+          <input type="range" min={1} max={3} step={0.1} value={zoom} onChange={(e) => setZoom(Number(e.target.value))} style={{ width: '150px' }} />
+        </div>
+        <button className="button" onClick={onCancel}>Batal</button>
+        <button className="button primary" onClick={async () => {
+          if (croppedAreaPixels) {
+            const file = await getCroppedImg(image, croppedAreaPixels);
+            onCropDone(file);
+          }
+        }}>Gunakan Potongan</button>
+      </div>
+    </div>
+  )
+}
 
 export function MainImageForm({
   item,
@@ -29,6 +129,8 @@ export function MainImageForm({
   const [imagePreview, setImagePreview] = useState(item?.image ?? "");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState("");
+  const [finalFileToUpload, setFinalFileToUpload] = useState<File | null>(null);
 
   useEffect(() => {
     return () => {
@@ -47,7 +149,7 @@ export function MainImageForm({
     const supabase = createClient();
     let imageUrl = item?.image || "";
     
-    const fileInput = form.get("imageFile") as File;
+    const fileInput = finalFileToUpload;
     if (fileInput && fileInput.size > 0) {
       setError("Mengoptimalkan dan mengunggah gambar...");
       const { url, error: uploadError } = await uploadImageToSupabase(fileInput, "main-posters");
@@ -122,11 +224,16 @@ export function MainImageForm({
             accept="image/jpeg, image/png, image/webp"
             disabled={loading}
             required={!item}
-            onChange={(e) => {
+            onChange={async (e) => {
               if (e.target.files && e.target.files[0]) {
-                if (imagePreview.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
-                const objectUrl = URL.createObjectURL(e.target.files[0]);
-                setImagePreview(objectUrl);
+                const file = e.target.files[0];
+                const { width, height, url } = await checkImageDimensions(file);
+                if (Math.abs(width / height - 0.8) < 0.005) {
+                  setFinalFileToUpload(file);
+                  setImagePreview(url);
+                } else {
+                  setCropImageSrc(url);
+                }
               }
             }}
           />
@@ -158,20 +265,20 @@ export function MainImageForm({
         <span>PRATINJAU FORMAT</span>
         <div
           className="ratio-preview-image"
-          style={{ width: "100%", height: "auto", maxHeight: "300px", objectFit: "contain", display: "flex", justifyContent: "center", alignItems: "center" }}
+          style={{ width: "100%", height: "auto", maxHeight: "300px", display: "flex", justifyContent: "center", alignItems: "center" }}
         >
           {imagePreview && (
             <img
               key={imagePreview}
               src={imagePreview}
               alt="Pratinjau Gambar Utama"
-              style={{ maxWidth: "100%", maxHeight: "300px", objectFit: "contain", borderRadius: "6px" }}
+              style={{ width: "auto", height: "auto", maxWidth: "100%", maxHeight: "300px", aspectRatio: "4/5", objectFit: "cover", borderRadius: "6px" }}
             />
           )}
         </div>
-        <small>Rasio gambar akan dipertahankan secara otomatis.</small>
+        <small>Gambar diwajibkan dalam rasio 4:5 (Instagram Portrait).</small>
         <p>
-          Gambar Utama ditampilkan dengan ukuran penuh dan menyesuaikan proporsi tanpa crop.
+          Gambar yang tidak sesuai rasio 4:5 akan dikrop secara otomatis melalui popup untuk memastikan tidak ada ruang kosong atau letterbox di public board.
         </p>
       </div>
       {error && (
@@ -180,6 +287,21 @@ export function MainImageForm({
         </p>
       )}
       <FormActions onCancel={onClose} />
+      
+      {cropImageSrc && (
+        <ImageCropper
+          image={cropImageSrc}
+          onCancel={() => {
+            setCropImageSrc("");
+            // Optionally clear the input file here if needed, but not strictly necessary
+          }}
+          onCropDone={(file) => {
+            setCropImageSrc("");
+            setFinalFileToUpload(file);
+            setImagePreview(URL.createObjectURL(file));
+          }}
+        />
+      )}
     </form>
   );
 }

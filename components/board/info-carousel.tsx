@@ -116,7 +116,6 @@ export function MainPoster({ items }: { items: InfoItem[] }) {
       className="main-poster panel"
       aria-label="Gambar Utama"
       aria-roledescription="carousel"
-      style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
     >
       {items.length ? (
         <div className="main-image-frame" style={{ position: "relative" }}>
@@ -131,12 +130,6 @@ export function MainPoster({ items }: { items: InfoItem[] }) {
                  zIndex: i === index ? 1 : 0
                }}
              >
-               <img
-                 src={item.image}
-                 alt=""
-                 className="main-image-backdrop"
-                 aria-hidden="true"
-               />
                <MediaImage
                  src={item.image}
                  alt={item.title || "Gambar Utama"}
@@ -148,12 +141,6 @@ export function MainPoster({ items }: { items: InfoItem[] }) {
         </div>
       ) : (
         <div className="main-image-frame" style={{ position: "relative" }}>
-           <img
-             src={settings.fallbackImage}
-             alt=""
-             className="main-image-backdrop"
-             aria-hidden="true"
-           />
            <MediaImage
              src={settings.fallbackImage}
              alt="Gambar Utama Fallback"

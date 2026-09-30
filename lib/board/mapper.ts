@@ -73,6 +73,8 @@ export function mapBoardData(
     fallbackImage: "",
     infoInterval: 8,
     mainImageInterval: 10,
+    addressLine1: "",
+    addressLine2: "",
   };
   settingsRow.forEach((r) => {
     if (r.key === "station_name") settingsObj.stationName = r.value as string;
@@ -86,6 +88,8 @@ export function mapBoardData(
     }
     if (r.key === "info_carousel_interval") settingsObj.infoInterval = parseInt(r.value as string) || 8;
     if (r.key === "main_image_interval") settingsObj.mainImageInterval = parseInt(r.value as string) || 10;
+    if (r.key === "address_line_1") settingsObj.addressLine1 = r.value as string;
+    if (r.key === "address_line_2") settingsObj.addressLine2 = r.value as string;
   });
 
   return {

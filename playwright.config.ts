@@ -16,5 +16,8 @@ export default defineConfig({
     url: "http://localhost:3100",
     reuseExistingServer: false,
     timeout: 30000,
+    env: {
+      PLAYWRIGHT_TEST: "1",
+    },
   },
 });

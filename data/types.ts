@@ -45,6 +45,8 @@ export interface Settings {
   fallbackImage: string;
   infoInterval: number;
   mainImageInterval: number;
+  addressLine1: string;
+  addressLine2: string;
 }
 export interface BoardData {
   stations: Station[];
