@@ -20,7 +20,11 @@ export function OfflineFallback({ image }: { image: string }) {
         priority
       />
       <div className="offline-message">
-        <Radio size={30} />
+        <img 
+          src="/rri/rri.png" 
+          alt="RRI Logo" 
+          style={{ height: 26, width: "auto", objectFit: "contain", marginBottom: 14, filter: "brightness(0) invert(1)", opacity: 0.85 }} 
+        />
         <span>SELALU DEKAT DENGAN ANDA</span>
         <h2>Siaran sedang tidak tersedia</h2>
         <p>

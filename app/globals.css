@@ -208,6 +208,34 @@
     font-weight: 750;
     white-space: nowrap;
   }
+  .channel-identity {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .channel-logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    padding: 6px 10px;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .channel-img {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .channel-freq {
+    font-size: 11px;
+    color: #1a1a1a;
+    font-weight: 700;
+  }
   .broadcast-status {
     @apply inline-flex items-center gap-2 shrink-0;
     border-radius: 20px;

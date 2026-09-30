@@ -46,18 +46,18 @@ export function ChannelBadge({ channel }: { channel: ChannelId }) {
 export function ChannelLogo({ channel, showFrequency }: { channel: ChannelId; showFrequency?: boolean }) {
   const asset = channelAssets[channel];
   return (
-    <div className={`channel-identity ${channel}`} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
-      <div className="channel-logo-container" style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "32px" }}>
+    <div className={`channel-identity ${channel}`}>
+      <div className="channel-logo-container" style={{ display: "flex", flexDirection: "column", height: "auto", minHeight: "36px", padding: showFrequency ? "6px 12px" : "6px 10px", gap: showFrequency ? "4px" : "0" }}>
         <Image
           src={asset.logo}
           alt={channelName(channel)}
           width={120}
           height={48}
           className="channel-img"
-          style={{ width: "auto", height: "auto", maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
+          style={{ height: showFrequency ? "28px" : "100%" }}
         />
+        {showFrequency && <small className="channel-freq">{asset.frequency}</small>}
       </div>
-      {showFrequency && <small className="channel-freq" style={{ fontSize: "11px", color: "var(--text-secondary)", fontWeight: 500 }}>{asset.frequency}</small>}
     </div>
   );
 }

@@ -10,6 +10,8 @@
 - Consistent save/loading/error feedback across all admin forms.
 
 ### Changed
+- Replaced the generic radio icon on the OFF AIR overlay with the official RRI logo, treated with a white monochrome filter (`brightness(0) invert(1)`) to maintain contrast and elegance.
+- Refined the PRO channel cards (in the header and schedule panel) by using a pure white background for the logo and frequency container, ensuring maximum contrast and readability for black frequency text.
 - Implemented dynamic accent colors across the public Info Board based on the currently active PRO channel, applied smoothly using CSS variables and root context injection.
 - Redesigned the ON AIR streaming overlay to be more minimalist, with a refined bottom gradient and cleaner layout to avoid obscuring visual content.
 - Redesigned the OFF AIR fallback screen into a centered translucent card with subtle background dimming, removing the massive dark panel blocking the fallback image.
