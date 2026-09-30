@@ -1844,14 +1844,10 @@
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
-  .broadcast-status.on i,
-  .ticker-track {
+  .broadcast-status.on i {
     animation: none;
   }
-  .ticker-window {
-    overflow-x: auto;
-  }
-  .ticker-copy[aria-hidden="true"] {
-    display: none;
+  .ticker-track {
+    animation-duration: calc(var(--ticker-duration, 45s) * 1.5) !important;
   }
 }

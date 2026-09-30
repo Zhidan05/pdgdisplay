@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed — 2026-09-30 19:37 WIB
+- Fixed functional broadcast motion being disabled on systems reporting `prefers-reduced-motion: reduce`.
+- Running Text now continues moving on dedicated display systems while respecting reduced decorative transitions.
+- Gambar Utama and Info Terbaru auto-rotation now remain active regardless of OS reduced-motion preference.
+- Fixed auto-rotation interval using `setTimeout` with reset on manual selection.
 ### Fixed — 2026-09-30 16:20 WIB
 - Fixed Supabase-managed images failing to render on Vercel by adding the Supabase Storage hostname to Next.js `remotePatterns` configuration.
 - Prevented potential memory leaks by ensuring temporary browser `blob:` URLs are properly revoked when image preview forms unmount or new files are selected.

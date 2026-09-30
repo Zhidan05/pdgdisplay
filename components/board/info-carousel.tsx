@@ -12,11 +12,11 @@ function useCarousel(length: number, delay: number) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   useEffect(() => {
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (length < 2 || paused || motion.matches) return;
-    const timer = setInterval(() => setIndex((i) => (i + 1) % length), delay);
-    return () => clearInterval(timer);
-  }, [length, delay, paused]);
+    const validDelay = (Number.isFinite(delay) && delay > 0) ? delay : 10000;
+    if (length < 2 || paused) return;
+    const timer = setTimeout(() => setIndex((i) => (i + 1) % length), validDelay);
+    return () => clearTimeout(timer);
+  }, [length, delay, paused, index]);
   return {
     index: length ? index % length : 0,
     select: setIndex,
