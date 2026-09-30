@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Pencil, Plus, Search } from "lucide-react";
 import {
   ASPECT_RATIOS,
@@ -72,6 +72,14 @@ export function InfoForm({
   const [imagePreview, setImagePreview] = useState(item?.image ?? "");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview.startsWith("blob:")) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -182,6 +190,7 @@ export function InfoForm({
             required={!item}
             onChange={(e) => {
               if (e.target.files && e.target.files[0]) {
+                if (imagePreview.startsWith("blob:")) URL.revokeObjectURL(imagePreview);
                 const objectUrl = URL.createObjectURL(e.target.files[0]);
                 setImagePreview(objectUrl);
               }

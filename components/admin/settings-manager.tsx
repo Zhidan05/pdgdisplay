@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Building2 } from "lucide-react";
 import { useBoardData } from "@/lib/supabase-provider";
 import { createClient } from "@/util/supabase/client";
@@ -19,6 +19,14 @@ export function SettingsManager() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [fallbackImagePreview, setFallbackImagePreview] = useState(settings.fallbackImage);
+
+  useEffect(() => {
+    return () => {
+      if (fallbackImagePreview.startsWith("blob:")) {
+        URL.revokeObjectURL(fallbackImagePreview);
+      }
+    };
+  }, [fallbackImagePreview]);
 
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -137,6 +145,7 @@ export function SettingsManager() {
                 disabled={loading}
                 onChange={(e) => {
                    if (e.target.files && e.target.files[0]) {
+                     if (fallbackImagePreview.startsWith("blob:")) URL.revokeObjectURL(fallbackImagePreview);
                      const objectUrl = URL.createObjectURL(e.target.files[0]);
                      setFallbackImagePreview(objectUrl);
                    }

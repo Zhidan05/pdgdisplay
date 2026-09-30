@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Fixed — 2026-09-30 16:20 WIB
+- Fixed Supabase-managed images failing to render on Vercel by adding the Supabase Storage hostname to Next.js `remotePatterns` configuration.
+- Prevented potential memory leaks by ensuring temporary browser `blob:` URLs are properly revoked when image preview forms unmount or new files are selected.
+- Replaced the missing static `/images/fallback/office.jpg` image with a robust UI placeholder to prevent broken-image icons when remote media fails to load.
+
 ### Fixed — 2026-09-30 16:07 WIB
 - Fixed Dashboard station previews incorrectly showing the obsolete `sensors` placeholder despite valid Supabase stream URLs.
 - Unified Dashboard stream source parsing with the Streaming and Public Board data flow using `getStreamSource`.
