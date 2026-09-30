@@ -273,6 +273,8 @@ Proporsi boleh disesuaikan selama visual balance tetap terjaga.
 # 9. Public Header
 
 Header harus compact.
+Header date and clock typography should be optimized for long-distance TV readability.
+Existing layout and proportions remain unchanged.
 
 ## Isi
 
@@ -293,7 +295,7 @@ Urutan kiri ke kanan:
 
 Date & Time Layout: DUA block sibling dengan ukuran visual sama. 
 Hari + tanggal: LEFT. 
-Jam: RIGHT. 
+Jam + Timezone (WIB): RIGHT (horizontal single-line).
 Equal width, equal height, aligned vertically.
 Pemisah mengandalkan spacing, alignment, atau 1px subtle divider.
 TIDAK MENGGUNAKAN panel background tambahan, border, card, atau rounded rectangle.
@@ -306,8 +308,8 @@ Contoh:
 ```
 
 ```txt
-RABU             | 19:40:25
-30 SEPTEMBER 2026| WIB
+RABU             | 19:40:25 WIB
+30 SEPTEMBER 2026|
 ```
 
 ## Channel State

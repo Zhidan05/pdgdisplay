@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Changed — 2026-09-30 20:40 WIB
+
+- Moved the public header timezone label "WIB" to the right side of the clock for a cleaner single-line time display.
+
+### Changed — 2026-09-30 20:37 WIB
+
+- Increased public header date and clock typography for improved readability on the fullscreen TV display without changing the established layout.
+
 ### Fixed — 2026-09-30 20:07 WIB
 
 - Fixed Gambar Utama container geometry so the rendered poster remains true 4:5 instead of inheriting an arbitrary center-column ratio.
