@@ -123,7 +123,7 @@ for (const viewport of [
     ).toBeVisible();
     await expect(page.locator("video")).toHaveCount(0);
     await expect(
-      page.locator(".schedule-item.current:has-text('PRO 1') .broadcast-status"),
+      page.locator(".schedule-item.current:has-text('PRO 2') .broadcast-status"),
     ).toHaveCount(0);
     await page.screenshot({
       path: `test-results/board-${viewport.width}-offline.png`,
