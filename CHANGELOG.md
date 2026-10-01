@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed — 2026-10-01 09:34 WIB
+- Refined the `Jadwal Hari Ini` card by improving visual separation between PRO 1, PRO 2, and PRO 4 schedule groups for better readability.
+- Preserved the rule that each PRO section displays a maximum of two nearest schedule items.
+
 ### Fixed — 2026-10-01 09:29 WIB
 - Fixed the public top-bar display-only PRO 3 card so its `88.4 FM` frequency label is rendered consistently beneath the logo like the other PRO channels.
 

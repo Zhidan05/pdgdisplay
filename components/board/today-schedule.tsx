@@ -71,7 +71,7 @@ export function TodaySchedule({
             : "Jadwal harian"}
         </span>
       </div>
-      <div className="all-schedules" style={{ display: "flex", flexDirection: "column", gap: "10px", flex: 1, overflow: "hidden" }}>
+      <div className="all-schedules" style={{ display: "flex", flexDirection: "column", gap: "24px", flex: 1, overflow: "hidden" }}>
         {stations.map(st => {
           const items = todaySchedules(
             schedules.filter((s) => s.channel === st.id),
@@ -99,17 +99,17 @@ export function TodaySchedule({
           if (visible.length === 0) return null;
           
           return (
-            <div key={st.id} className="channel-schedule-group" style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", borderBottom: "1px solid var(--border-subtle)", paddingBottom: "6px", marginBottom: "4px", paddingLeft: "10px" }}>
+            <div key={st.id} className="channel-schedule-group" style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", borderBottom: "2px solid var(--border-subtle)", paddingBottom: "8px", marginBottom: "4px", paddingLeft: "4px" }}>
                 <img
                   src={`/rri/${st.id}.png`}
                   alt={`RRI ${st.id}`}
                   className="schedule-channel-logo"
-                  style={{ height: "32px", width: "auto", objectFit: "contain" }}
+                  style={{ height: "24px", width: "auto", objectFit: "contain" }}
                 />
-                <span style={{ fontSize: "14px", fontWeight: "700", color: "var(--text-secondary)", letterSpacing: "0.5px" }}>{st.frequency}</span>
+                <span style={{ fontSize: "13px", fontWeight: "700", color: "var(--text-secondary)", letterSpacing: "1px" }}>{st.frequency}</span>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              <div style={{ display: "flex", flexDirection: "column" }}>
                 {visible.map(item => (
                   <ScheduleItem
                     key={item.id}
