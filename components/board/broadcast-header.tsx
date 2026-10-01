@@ -79,17 +79,31 @@ export function BroadcastHeader({
       </div>
       <div className="header-channels">
         <BroadcastStatus available={hasStream(station.streamUrl)} />
-        <nav aria-label="Pilih saluran" className="channel-selector">
-          {stations.map((s) => (
-            <button
-              key={s.id}
-              className={`channel-button ${s.id} ${selected === s.id ? "selected" : ""}`}
-              aria-pressed={selected === s.id}
-              onClick={() => onSelect(s.id)}
-            >
-              <ChannelLogo channel={s.id} showFrequency />
-            </button>
-          ))}
+        <nav aria-label="Pilih saluran" className="channel-selector" style={{ gap: "4px" }}>
+          {["pro1", "pro2", "pro3", "pro4"].map((ch) => {
+            if (ch === "pro3") {
+              return (
+                <div
+                  key={ch}
+                  className={`channel-button ${ch}`}
+                  aria-label="RRI PRO 3"
+                  style={{ cursor: "default" }}
+                >
+                  <ChannelLogo channel={ch} showFrequency />
+                </div>
+              );
+            }
+            return (
+              <button
+                key={ch}
+                className={`channel-button ${ch} ${selected === ch ? "selected" : ""}`}
+                aria-pressed={selected === ch}
+                onClick={() => onSelect(ch as ChannelId)}
+              >
+                <ChannelLogo channel={ch} showFrequency />
+              </button>
+            );
+          })}
         </nav>
         <button
           className={`icon-button ${!audio.actualSoundEnabled && audio.autoplayBlocked ? "pulse-warn" : ""}`}

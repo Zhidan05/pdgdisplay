@@ -7,6 +7,7 @@ import { formatDate } from "@/lib/broadcast";
 import { useBoardData } from "@/lib/supabase-provider";
 import { EmptyState } from "@/components/shared/broadcast-ui";
 import { MediaImage } from "@/components/shared/media-image";
+import { PrayerCountdown } from "@/components/board/prayer-countdown";
 
 function useCarousel(length: number, delay: number) {
   const [index, setIndex] = useState(0);
@@ -59,11 +60,14 @@ export function LatestInfoCarousel({ items }: { items: InfoItem[] }) {
       aria-label="Info Terbaru"
       aria-roledescription="carousel"
     >
-      <div className="section-heading">
-        <h2>
-          <i />
-          INFO TERBARU
-        </h2>
+      <div className="section-heading" style={{ alignItems: "flex-start" }}>
+        <div className="section-title-group" style={{ display: "flex", flexDirection: "column" }}>
+          <h2>
+            <i />
+            INFO TERBARU
+          </h2>
+          <PrayerCountdown />
+        </div>
         <div className="carousel-controls">
           <button
             className="icon-button"

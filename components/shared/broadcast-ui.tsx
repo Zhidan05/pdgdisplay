@@ -3,9 +3,10 @@ import { Radio } from "lucide-react";
 import type { ChannelId } from "@/data/types";
 import { channelName } from "@/lib/broadcast";
 
-export const channelAssets: Record<ChannelId, { logo: string; frequency: string }> = {
+export const channelAssets: Record<string, { logo: string; frequency?: string }> = {
   pro1: { logo: "/rri/pro1.png", frequency: "95.9 FM" },
   pro2: { logo: "/rri/pro2.png", frequency: "90.8 FM" },
+  pro3: { logo: "/rri/pro3.png", frequency: "88.4 FM" }, // Display-only
   pro4: { logo: "/rri/pro4.png", frequency: "92.4 FM" },
 };
 
@@ -43,20 +44,20 @@ export function ChannelBadge({ channel }: { channel: ChannelId }) {
     <span className={`channel-badge ${channel}`}>{channelName(channel)}</span>
   );
 }
-export function ChannelLogo({ channel, showFrequency }: { channel: ChannelId; showFrequency?: boolean }) {
+export function ChannelLogo({ channel, showFrequency }: { channel: string; showFrequency?: boolean }) {
   const asset = channelAssets[channel];
   return (
-    <div className={`channel-identity ${channel}`}>
-      <div className="channel-logo-container" style={{ display: "flex", flexDirection: "column", height: "auto", minHeight: "36px", padding: showFrequency ? "6px 12px" : "6px 10px", gap: showFrequency ? "4px" : "0" }}>
+    <div className={`channel-identity ${channel}`} style={{ width: "100%", height: "100%" }}>
+      <div className="channel-logo-container" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", minHeight: "36px", padding: showFrequency ? "8px 12px" : "8px 12px", gap: showFrequency ? "4px" : "0", width: "100%" }}>
         <Image
           src={asset.logo}
-          alt={channelName(channel)}
+          alt={channel}
           width={120}
           height={48}
           className="channel-img"
-          style={{ height: showFrequency ? "28px" : "100%" }}
+          style={{ height: showFrequency && asset.frequency ? "28px" : "32px", width: "auto", objectFit: "contain" }}
         />
-        {showFrequency && <small className="channel-freq">{asset.frequency}</small>}
+        {showFrequency && asset.frequency && <small className="channel-freq">{asset.frequency}</small>}
       </div>
     </div>
   );

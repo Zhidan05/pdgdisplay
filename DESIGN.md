@@ -290,8 +290,13 @@ Urutan kiri ke kanan:
 6. Broadcast status
 7. PRO 1
 8. PRO 2
-9. PRO 4
-10. Utility actions bila diperlukan
+9. PRO 3 (Display Only)
+10. PRO 4
+11. Utility actions bila diperlukan
+
+- Public top channel area displays PRO 1, PRO 2, PRO 3, and PRO 4.
+- PRO 1, PRO 2, and PRO 4 remain selectable stream channels.
+- PRO 3 is visual branding only and is intentionally non-interactive.
 
 Date & Time Layout: DUA block sibling dengan ukuran visual sama. 
 Hari + tanggal: LEFT. 
@@ -510,6 +515,14 @@ INFO TERBARU
 ```
 
 Info Terbaru menjadi area visual multi-format.
+
+INFO TERBARU:
+- A compact secondary line beneath the heading displays the next Padang prayer countdown.
+- Format: `<Prayer> dalam HH:mm:ss`.
+- Prayer times are calculated locally using Adhan.js with fixed Kota Padang coordinates.
+- No geolocation is used.
+- Addition must not alter approved Public Board geometry.
+- Prayer countdown typography beneath Info Terbaru is only slightly smaller than the section title for TV readability.
 
 ## 13.1 Supported Ratios
 

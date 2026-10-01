@@ -355,19 +355,18 @@
     margin-right: 8px;
   }
   .channel-button {
-    @apply flex items-center gap-2;
-    border: 1px solid var(--border-subtle);
+    @apply flex items-center justify-center;
+    border: 2px solid var(--border-subtle);
     border-radius: 6px;
-    padding: 8px 12px;
-    min-width: 83px;
-    background: var(--bg-panel);
-    text-align: left;
+    padding: 0;
+    min-width: 90px;
+    background: #ffffff;
+    text-align: center;
+    overflow: hidden;
+    transition: all 0.2s ease;
   }
   .channel-button i {
-    background: var(--channel);
-    width: 5px;
-    height: 21px;
-    border-radius: 3px;
+    display: none;
   }
   .channel-button span {
     font-size: 13px;
@@ -376,15 +375,13 @@
   }
   .channel-button small {
     display: block;
-    color: var(--text-secondary);
-    font-size: 10px;
-    font-weight: 450;
-    margin-top: 3px;
+    color: #333333;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 2px;
   }
   .channel-button.selected {
     border-color: var(--accent);
-    color: var(--accent);
-    background: var(--accent-soft);
     box-shadow: 0 0 10px var(--accent-muted);
   }
   .main-board-grid {

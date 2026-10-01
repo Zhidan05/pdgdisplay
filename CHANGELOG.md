@@ -2,6 +2,24 @@
 
 ## [Unreleased]
 
+### Fixed — 2026-10-01 09:29 WIB
+- Fixed the public top-bar display-only PRO 3 card so its `88.4 FM` frequency label is rendered consistently beneath the logo like the other PRO channels.
+
+### Changed — 2026-10-01 09:24 WIB
+- Refined the public top-bar PRO channel cards so their interior area is fully white, removing the visible blue inner gaps and normalizing logo proportions across PRO 1, PRO 2, PRO 3, and PRO 4.
+- Adjusted the display-only PRO 3 top-bar presentation so it no longer appears visually oversized while remaining non-interactive.
+
+### Added — 2026-10-01 09:19 WIB
+- Added RRI PRO 3 branding to the public header using `/images/rri/pro3.png` as a non-interactive display-only channel identity.
+
+### Changed — 2026-10-01 09:19 WIB
+- Increased the next-prayer countdown typography beneath Info Terbaru so it remains only slightly smaller than the section heading for improved TV readability.
+
+### Added — 2026-10-01 09:11 WIB
+
+- Added a realtime next-prayer countdown beneath Info Terbaru using local Adhan.js calculations with fixed Kota Padang coordinates.
+- Added automatic WIB-aware prayer transitions through Subuh, Dzuhur, Ashar, Maghrib, Isya, and the following day's Subuh without geolocation or external prayer APIs.
+
 ### Fixed — 2026-09-30 20:51 WIB
 
 - Fixed missing mobile Admin navigation trigger when the persistent desktop sidebar is hidden.
