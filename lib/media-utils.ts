@@ -53,7 +53,40 @@ export function getYouTubeEmbedUrl(videoId: string): string {
 export type StreamSource =
   | { type: "youtube"; videoId: string; embedUrl: string }
   | { type: "video"; url: string }
+  | { type: "audio"; url: string }
   | { type: "unknown"; url: string };
+
+export function isAudioStreamUrl(url: string): boolean {
+  if (!url) return false;
+  const lower = url.toLowerCase().trim();
+  return (
+    lower.endsWith(".mp3") ||
+    lower.endsWith(".aac") ||
+    lower.endsWith(".m4a") ||
+    lower.endsWith(".ogg") ||
+    lower.endsWith(".oga") ||
+    lower.endsWith(".wav") ||
+    lower.includes("streaming.rri.go.id") ||
+    lower.includes("rripadang") ||
+    lower.includes(".mp3?") ||
+    lower.includes(".aac?") ||
+    lower.includes("/audio") ||
+    lower.includes("icecast") ||
+    lower.includes("shoutcast")
+  );
+}
+
+export function isVideoStreamUrl(url: string): boolean {
+  if (!url) return false;
+  const lower = url.toLowerCase().trim();
+  return (
+    lower.endsWith(".mp4") ||
+    lower.endsWith(".webm") ||
+    lower.endsWith(".m3u8") ||
+    lower.includes("/video") ||
+    lower.includes("/media/")
+  );
+}
 
 export function getStreamSource(url: string): StreamSource | null {
   if (!url || !url.trim()) return null;
@@ -61,10 +94,14 @@ export function getStreamSource(url: string): StreamSource | null {
   if (ytId) {
     return { type: "youtube", videoId: ytId, embedUrl: getYouTubeEmbedUrl(ytId) };
   }
-  if (url.endsWith(".mp4") || url.endsWith(".webm") || url.includes("/media/")) {
+  if (isVideoStreamUrl(url)) {
     return { type: "video", url };
   }
-  return { type: "unknown", url };
+  if (isAudioStreamUrl(url)) {
+    return { type: "audio", url };
+  }
+  // Default to audio for direct stream URLs on the radio info board
+  return { type: "audio", url };
 }
 
 export async function deleteStorageFile(url: string) {

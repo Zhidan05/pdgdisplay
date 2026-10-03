@@ -55,6 +55,11 @@ export function StationStatusCard({
             alt="YouTube Stream Preview"
             className="w-full h-full object-cover"
           />
+        ) : source?.type === "audio" ? (
+          <div className="w-full h-full bg-[#020c17] flex flex-col items-center justify-center text-text-muted gap-2">
+            <span className="material-symbols-outlined text-4xl">radio</span>
+            <span className="text-xs">STREAMING AUDIO RRI</span>
+          </div>
         ) : source?.type === "video" || source?.type === "unknown" ? (
            <div className="w-full h-full bg-[#020c17] flex flex-col items-center justify-center text-text-muted gap-2">
              <span className="material-symbols-outlined text-4xl">play_circle</span>
@@ -66,7 +71,7 @@ export function StationStatusCard({
              <span className="text-xs">PRATINJAU TIDAK TERSEDIA</span>
           </div>
         )}
-        <span>{available ? (source?.type === "youtube" ? "YOUTUBE TERSEDIA" : "SUMBER TERSEDIA") : "FALLBACK AKTIF"}</span>
+        <span>{available ? (source?.type === "youtube" ? "YOUTUBE TERSEDIA" : source?.type === "audio" ? "AUDIO RRI TERSEDIA" : "SUMBER TERSEDIA") : "FALLBACK AKTIF"}</span>
       </div>
       <div className="station-current">
         <div className="flex justify-between gap-2">

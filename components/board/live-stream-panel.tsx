@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { AudioLines, VolumeX } from "lucide-react";
+import { AudioLines, VolumeX, Play } from "lucide-react";
 import {
   ChannelLogo,
 } from "@/components/shared/broadcast-ui";
@@ -12,7 +12,17 @@ import { useOptionalAudio } from "./audio-context";
 
 export type StreamRenderMode = "broadcast" | "preview";
 
-export function OfflineFallback({ image }: { image: string }) {
+export function OfflineFallback({
+  image,
+  message = "Siaran sedang tidak tersedia",
+  actionButton,
+  onAction,
+}: {
+  image: string;
+  message?: string;
+  actionButton?: React.ReactNode;
+  onAction?: () => void;
+}) {
   const isValidImage = image && image.trim() !== "" && !image.includes("studio.jpg");
   return (
     <div className="offline-fallback">
@@ -24,14 +34,23 @@ export function OfflineFallback({ image }: { image: string }) {
           priority
         />
       )}
-      <div className="offline-message">
+      <div
+        className="offline-message"
+        onClick={onAction}
+        style={{ cursor: onAction ? "pointer" : "default" }}
+      >
         <img
           src="/rri/rri.png"
           alt="RRI Logo"
           style={{ height: 32, width: "auto", objectFit: "contain", marginBottom: 16, filter: "brightness(0) invert(1)", opacity: 0.95 }}
         />
         <span>Sekali di Udara, Tetap di Udara</span>
-        <h2>Siaran sedang tidak tersedia</h2>
+        <h2>{message}</h2>
+        {actionButton && (
+          <div className="offline-action" style={{ marginTop: 12 }}>
+            {actionButton}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -324,7 +343,222 @@ function HtmlVideoPlayer({ url, onFail, mode }: { url: string, onFail: () => voi
   );
 }
 
-function StreamMedia({ url, mode }: { url: string, mode: StreamRenderMode }) {
+function RriAudioPlayer({
+  url,
+  fallbackImage,
+  mode,
+}: {
+  url: string;
+  fallbackImage: string;
+  mode: StreamRenderMode;
+}) {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const audioCtx = useOptionalAudio();
+  const isPreview = mode === "preview" || !audioCtx;
+  const hasEverPlayedRef = useRef(false);
+  const [status, setStatus] = useState<
+    "connecting" | "playing" | "blocked" | "buffering" | "error"
+  >(isPreview ? "blocked" : "connecting");
+
+  const retryCountRef = useRef(0);
+  const MAX_RETRIES = 3;
+
+  const startPlayback = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    retryCountRef.current = 0;
+    audio.muted = false;
+    audio.volume = isPreview ? 0 : ((audioCtx ? audioCtx.volume : 80) / 100);
+    setStatus("connecting");
+
+    audio.play().catch((err) => {
+      if (err instanceof DOMException && (err.name === "NotAllowedError" || err.name === "AbortError")) {
+        setStatus("blocked");
+        if (audioCtx && !isPreview) {
+          audioCtx.setActualSoundEnabled(false);
+          audioCtx.setAutoplayBlocked(true);
+        }
+      } else {
+        setStatus("error");
+      }
+    });
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    hasEverPlayedRef.current = false;
+
+    audio.src = url;
+    audio.preload = "auto";
+    audio.volume = isPreview ? 0 : ((audioCtx ? audioCtx.volume : 80) / 100);
+    audio.muted = isPreview ? true : !(audioCtx ? audioCtx.preferredSoundEnabled : true);
+
+    if (isPreview) {
+      return;
+    }
+
+    const onPlaying = () => {
+      if (!isMounted) return;
+      hasEverPlayedRef.current = true;
+      retryCountRef.current = 0;
+      setStatus("playing");
+      if (audioCtx && !isPreview) {
+        audioCtx.setActualSoundEnabled(true);
+        audioCtx.setAutoplayBlocked(false);
+      }
+    };
+
+    const onError = () => {
+      if (!isMounted) return;
+      if (retryCountRef.current < MAX_RETRIES) {
+        retryCountRef.current += 1;
+        setStatus("connecting");
+        setTimeout(() => {
+          if (!isMounted) return;
+          audio.load();
+          audio.play().catch(() => {});
+        }, 1500 * retryCountRef.current);
+      } else {
+        setStatus("error");
+      }
+    };
+
+    const onWaiting = () => {
+      if (!isMounted) return;
+      if (status === "playing") {
+        setStatus("buffering");
+      }
+    };
+
+    const onStalled = () => {
+      if (!isMounted) return;
+      if (hasEverPlayedRef.current && status === "playing") {
+        setStatus("buffering");
+      }
+    };
+
+    audio.addEventListener("playing", onPlaying);
+    audio.addEventListener("error", onError);
+    audio.addEventListener("waiting", onWaiting);
+    audio.addEventListener("stalled", onStalled);
+
+    if (audioCtx && !isPreview) {
+      audioCtx.registerRetryCallback(() => {
+        if (!isMounted) return;
+        startPlayback();
+      });
+    }
+
+    audio
+      .play()
+      .then(() => {
+        // Playback requested, 'playing' event will trigger when stream actually plays
+      })
+      .catch((err) => {
+        if (!isMounted) return;
+        if (err instanceof DOMException && (err.name === "NotAllowedError" || err.name === "AbortError")) {
+          setStatus("blocked");
+          if (audioCtx) {
+            audioCtx.setActualSoundEnabled(false);
+            audioCtx.setAutoplayBlocked(true);
+          }
+        } else {
+          setStatus("error");
+        }
+      });
+
+    return () => {
+      isMounted = false;
+      audio.removeEventListener("playing", onPlaying);
+      audio.removeEventListener("error", onError);
+      audio.removeEventListener("waiting", onWaiting);
+      audio.removeEventListener("stalled", onStalled);
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url, isPreview]);
+
+  useEffect(() => {
+    if (isPreview || !audioCtx) return;
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.volume = audioCtx.volume / 100;
+    if (audioCtx.preferredSoundEnabled) {
+      audio.muted = false;
+      if (audio.paused && (status === "playing" || status === "blocked")) {
+        audio.play().catch(() => {});
+      }
+    } else {
+      audio.muted = true;
+    }
+  }, [audioCtx?.volume, audioCtx?.preferredSoundEnabled, isPreview, status]);
+
+  let message = "Siaran sedang tidak tersedia";
+  let showAction = false;
+
+  switch (status) {
+    case "connecting":
+      message = "Menghubungkan ke siaran RRI...";
+      break;
+    case "playing":
+      message = "Siaran radio sedang diputar";
+      break;
+    case "blocked":
+      message = "Tekan untuk memulai siaran";
+      showAction = true;
+      break;
+    case "buffering":
+      message = "Menyambungkan kembali...";
+      break;
+    case "error":
+      message = "Siaran sementara tidak tersedia";
+      break;
+  }
+
+  const actionButton = showAction ? (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        startPlayback();
+      }}
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[var(--accent)] hover:bg-[#e06c00] active:scale-95 text-white text-xs font-semibold shadow-md transition-all cursor-pointer"
+      aria-label="Mulai siaran audio"
+    >
+      <Play size={14} className="fill-current" />
+      <span>PUTAR SIARAN</span>
+    </button>
+  ) : null;
+
+  return (
+    <>
+      <audio ref={audioRef} className="hidden" aria-hidden="true" />
+      <OfflineFallback
+        image={fallbackImage}
+        message={message}
+        actionButton={actionButton}
+        onAction={showAction ? startPlayback : undefined}
+      />
+    </>
+  );
+}
+
+function StreamMedia({
+  url,
+  fallbackImage,
+  mode,
+}: {
+  url: string;
+  fallbackImage: string;
+  mode: StreamRenderMode;
+}) {
   const [failed, setFailed] = useState(false);
   const [prevUrl, setPrevUrl] = useState(url);
 
@@ -340,13 +574,27 @@ function StreamMedia({ url, mode }: { url: string, mode: StreamRenderMode }) {
       {!failed && source?.type === "youtube" && (
         <YouTubePlayer videoId={source.videoId} onFail={() => setFailed(true)} mode={mode} />
       )}
-      {!failed && (source?.type === "video" || source?.type === "unknown") && (
+      {!failed && source?.type === "video" && (
         <HtmlVideoPlayer url={source.url} onFail={() => setFailed(true)} mode={mode} />
       )}
-      {failed && <span className="media-notice">Pratinjau belum tersedia</span>}
+      {!failed && (source?.type === "audio" || source?.type === "unknown") && (
+        <RriAudioPlayer
+          key={source.url}
+          url={source.url}
+          fallbackImage={fallbackImage}
+          mode={mode}
+        />
+      )}
+      {failed && (
+        <OfflineFallback
+          image={fallbackImage}
+          message="Siaran sedang tidak tersedia"
+        />
+      )}
     </>
   );
 }
+
 export function LiveStreamPanel({
   station,
   current,
@@ -368,9 +616,13 @@ export function LiveStreamPanel({
     >
       <div className="live-media">
         {available ? (
-          <StreamMedia url={station.streamUrl!} mode={mode || "broadcast"} />
+          <StreamMedia
+            url={station.streamUrl!}
+            fallbackImage={fallbackImage}
+            mode={mode || "broadcast"}
+          />
         ) : (
-          <OfflineFallback image={fallbackImage} />
+          <OfflineFallback image={fallbackImage} message="Siaran sedang tidak tersedia" />
         )}
         <div className="live-top">
           <div className="flex flex-col items-center gap-1.5 drop-shadow-md">

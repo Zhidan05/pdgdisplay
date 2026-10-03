@@ -1542,6 +1542,15 @@
     display: none;
   }
 
+  .compact-live .offline-action {
+    margin-top: 6px !important;
+  }
+
+  .compact-live .offline-action button {
+    padding: 3px 8px !important;
+    font-size: 10px !important;
+  }
+
   .compact-live .live-top {
     top: 8px;
     left: 8px;

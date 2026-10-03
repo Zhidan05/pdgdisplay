@@ -2,6 +2,25 @@
 
 ## [Unreleased]
 
+### Fixed — 2026-10-03 19:04 WIB
+- **Stream Audio Player**: Dirombak ulang keseluruhan logic pada `RriAudioPlayer` (MP3/AAC radio stream) yang sebelumnya memiliki bug "Siaran sedang tidak tersedia" padahal stream aktif.
+  - Menghapus paksaan timeout 15 detik yang sebelumnya meng-override state menjadi offline saat stream lambat dimuat.
+  - Memperbaiki siklus hidup (lifecycle) event `<audio>` HTML5: memanfaatkan native event (`error`, `playing`, `waiting`, `stalled`) untuk menentukan ketersediaan stream yang sebenarnya.
+  - Mengimplementasikan limited retry mechanism (maks. 3 kali) dengan exponential backoff untuk error media yang wajar (terputus sementara), tanpa meng-crash public UI.
+  - Memperbaiki teks UI sesuai permintaan: "Menghubungkan ke siaran RRI...", "Siaran radio sedang diputar", "Tekan untuk memulai siaran" dengan tombol **PUTAR SIARAN**, "Menyambungkan kembali...", dan "Siaran sementara tidak tersedia".
+
+### Changed — 2026-10-03 18:55 WIB
+- Replaced custom audio now-playing interfaces with the exact visual design of the existing offline fallback card for direct RRI MP3/AAC audio streams.
+- Preserved the full offline fallback layout: Gedung RRI Padang background, glassmorphism container, RRI logo (`/rri/rri.png`), and official slogan ("Sekali di Udara, Tetap di Udara") without custom equalizers or visualizers.
+- Implemented dynamic fallback state messages for audio streams:
+  - Connecting: `"Menghubungkan ke siaran RRI..."`
+  - Playing: `"Siaran radio sedang diputar"` (only triggered once native audio actually starts playing)
+  - Autoplay blocked: `"Tekan untuk memulai siaran"` with a distinct interaction button and whole-card click trigger
+  - Disconnected: `"Koneksi siaran terputus"`
+  - Unavailable: `"Siaran sedang tidak tersedia"`
+- Preserved unmuted autoplay attempts at normal volume without force-muting on browser rejection.
+- Maintained existing YouTube video embed and streaming behavior untouched on PRO 4.
+
 ### Changed — 2026-10-03 18:20 WIB
 - Enlarged prayer countdown typography to 22px on TV resolution (and responsive `clamp(18px, 1.4vw, 22px)` on desktop/laptop).
 - Added an accent border (`rgba(255, 122, 0, 0.45)`) with subtle background glow to make the prayer countdown stand out distinctly beneath `INFO TERBARU`.

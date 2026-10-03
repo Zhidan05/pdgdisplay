@@ -32,7 +32,6 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     }
     const storedVol = localStorage.getItem("rri-audio-volume");
     if (storedVol !== null) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVolumeState(Number(storedVol) || 80);
     }
   }, []);
