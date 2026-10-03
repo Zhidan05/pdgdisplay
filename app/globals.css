@@ -642,10 +642,10 @@
   }
 
   .prayer-countdown {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 8px;
-    width: fit-content;
+    justify-content: space-between;
+    width: 100%;
     font-size: clamp(18px, 1.4vw, 22px);
     color: var(--text-secondary);
     font-weight: 500;
@@ -663,6 +663,12 @@
   .prayer-countdown .prayer-name {
     color: var(--accent);
     font-weight: 700;
+  }
+
+  .prayer-countdown .prayer-time-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .prayer-countdown .prayer-label {

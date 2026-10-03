@@ -61,7 +61,7 @@ export function LatestInfoCarousel({ items }: { items: InfoItem[] }) {
       aria-roledescription="carousel"
     >
       <div className="section-heading" style={{ alignItems: "flex-start" }}>
-        <div className="section-title-group" style={{ display: "flex", flexDirection: "column" }}>
+        <div className="section-title-group" style={{ display: "flex", flexDirection: "column", flex: "0 0 48%" }}>
           <h2>
             <i />
             INFO TERBARU

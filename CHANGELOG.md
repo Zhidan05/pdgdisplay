@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed — 2026-10-03 20:41 WIB
+- Modified the prayer countdown container to span exactly `48%` of the parent content area, aligning its right edge perfectly flush with the 16:9 poster image below it. 
+- Restructured the prayer text into a flex layout (`space-between`), pushing the prayer name to the far left and the countdown time to the far right for a clean dashboard alignment.
+
 ### Changed — 2026-10-03 20:10 WIB
 - Enlarged only the clock/time text of the prayer countdown by `25%` (`1.25em`) without affecting the surrounding layout or the prayer name labels.
 

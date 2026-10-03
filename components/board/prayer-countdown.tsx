@@ -37,8 +37,10 @@ export function PrayerCountdown() {
         aria-hidden="true"
       >
         <span className="prayer-name">Subuh</span>
-        <span className="prayer-label">dalam</span>
-        <span className="prayer-time">00:00:00</span>
+        <div className="prayer-time-group">
+          <span className="prayer-label">dalam</span>
+          <span className="prayer-time">00:00:00</span>
+        </div>
       </div>
     );
   }
@@ -46,8 +48,10 @@ export function PrayerCountdown() {
   return (
     <div className="prayer-countdown">
       <span className="prayer-name">{nextPrayer.name}</span>
-      <span className="prayer-label">dalam</span>
-      <span className="prayer-time">{countdownText}</span>
+      <div className="prayer-time-group">
+        <span className="prayer-label">dalam</span>
+        <span className="prayer-time">{countdownText}</span>
+      </div>
     </div>
   );
 }
