@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Changed — 2026-10-03 18:02 WIB
+- Further increased the prayer countdown font size to 19px for TV display resolution (and responsive `clamp(15px, 1.1vw, 18px)` across other viewports) without modifying any other design elements.
+
+### Changed — 2026-10-03 17:58 WIB
+- Adjusted the prayer countdown typography and spacing beneath `INFO TERBARU` for 1080p TV displays.
+- Increased font size to 16px on TV screens (and responsive scaling on smaller viewports) with enhanced weight and tabular numbers for stable, clear distance readability.
+- Optimized vertical spacing to leave comfortable breathing room above the info carousel card without excessive empty space or layout overflow.
+
 ### Changed — 2026-10-01 09:34 WIB
 - Refined the `Jadwal Hari Ini` card by improving visual separation between PRO 1, PRO 2, and PRO 4 schedule groups for better readability.
 - Preserved the rule that each PRO section displays a maximum of two nearest schedule items.
