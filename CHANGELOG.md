@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed — 2026-10-03 18:20 WIB
+- Enlarged prayer countdown typography to 22px on TV resolution (and responsive `clamp(18px, 1.4vw, 22px)` on desktop/laptop).
+- Added an accent border (`rgba(255, 122, 0, 0.45)`) with subtle background glow to make the prayer countdown stand out distinctly beneath `INFO TERBARU`.
+- Formatted prayer items with distinct styling: prayer name highlighted in RRI orange accent, countdown time in bold white, and structured semantic flex spacing without layout shifts.
+
 ### Changed — 2026-10-03 18:02 WIB
 - Further increased the prayer countdown font size to 19px for TV display resolution (and responsive `clamp(15px, 1.1vw, 18px)` across other viewports) without modifying any other design elements.
 

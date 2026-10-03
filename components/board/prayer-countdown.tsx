@@ -36,14 +36,17 @@ export function PrayerCountdown() {
         style={{ opacity: 0, visibility: "hidden" }}
         aria-hidden="true"
       >
-        <span>Subuh</span> dalam <span>00:00:00</span>
+        <span className="prayer-name">Subuh</span>
+        <span className="prayer-label">dalam</span>
+        <span className="prayer-time">00:00:00</span>
       </div>
     );
   }
 
   return (
     <div className="prayer-countdown">
-      <span className="prayer-name">{nextPrayer.name}</span> dalam{" "}
+      <span className="prayer-name">{nextPrayer.name}</span>
+      <span className="prayer-label">dalam</span>
       <span className="prayer-time">{countdownText}</span>
     </div>
   );

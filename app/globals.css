@@ -642,24 +642,39 @@
   }
 
   .prayer-countdown {
-    font-size: clamp(17px, 1.35vw, 21px);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    font-size: clamp(18px, 1.4vw, 22px);
     color: var(--text-secondary);
     font-weight: 500;
-    line-height: 1.35;
-    margin-top: 5px;
+    line-height: 1.2;
+    margin-top: 8px;
+    padding: 6px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 122, 0, 0.45);
+    background: rgba(255, 122, 0, 0.08);
+    box-shadow: 0 0 12px rgba(255, 122, 0, 0.08);
     letter-spacing: 0.2px;
     font-variant-numeric: tabular-nums;
   }
 
   .prayer-countdown .prayer-name {
-    color: var(--text-primary);
-    font-weight: 600;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .prayer-countdown .prayer-label {
+    color: var(--text-secondary);
+    font-weight: 450;
+    font-size: 0.95em;
   }
 
   .prayer-countdown .prayer-time {
-    color: var(--text-primary);
-    font-weight: 600;
-    letter-spacing: 0.3px;
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: 0.5px;
   }
 
   .latest-info {
@@ -1955,8 +1970,10 @@
   }
 
   .prayer-countdown {
-    font-size: 19px;
-    margin-top: 6px;
+    font-size: 22px;
+    padding: 6px 16px;
+    margin-top: 10px;
+    gap: 9px;
   }
 
   .latest-info-card {
@@ -1992,7 +2009,9 @@
 
   .prayer-countdown {
     font-size: 14px;
-    margin-top: 2px;
+    padding: 3px 10px;
+    margin-top: 3px;
+    gap: 6px;
   }
 
   .latest-info-card {
