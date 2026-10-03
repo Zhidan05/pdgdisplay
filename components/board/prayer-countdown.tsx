@@ -33,30 +33,18 @@ export function PrayerCountdown() {
     return (
       <div 
         className="prayer-countdown" 
-        style={{ 
-          fontSize: "0.85em", 
-          opacity: 0, 
-          minHeight: "1.2em",
-          marginTop: "0.15em"
-        }}
+        style={{ opacity: 0, visibility: "hidden" }}
+        aria-hidden="true"
       >
-        Placeholder
+        <span>Subuh</span> dalam <span>00:00:00</span>
       </div>
     );
   }
 
   return (
-    <div 
-      className="prayer-countdown" 
-      style={{ 
-        fontSize: "0.85em", 
-        opacity: 0.85, 
-        marginTop: "0.15em",
-        fontWeight: 500,
-        lineHeight: 1
-      }}
-    >
-      <span style={{ fontWeight: 600 }}>{nextPrayer.name}</span> dalam <span style={{ opacity: 0.9 }}>{countdownText}</span>
+    <div className="prayer-countdown">
+      <span className="prayer-name">{nextPrayer.name}</span> dalam{" "}
+      <span className="prayer-time">{countdownText}</span>
     </div>
   );
 }

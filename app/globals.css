@@ -550,6 +550,24 @@
     color: var(--accent);
     transition: color 300ms ease;
   }
+  .prayer-countdown {
+    font-size: clamp(13px, 0.85vw, 15px);
+    color: var(--text-secondary);
+    font-weight: 500;
+    line-height: 1.35;
+    margin-top: 5px;
+    letter-spacing: 0.2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .prayer-countdown .prayer-name {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  .prayer-countdown .prayer-time {
+    color: var(--text-primary);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
   .latest-info {
     display: flex;
     flex-direction: column;
@@ -1626,6 +1644,10 @@
   .section-heading {
     padding: 22px 20px 14px;
   }
+  .prayer-countdown {
+    font-size: 16px;
+    margin-top: 6px;
+  }
   .latest-info-card {
     padding: 18px 20px 24px;
   }
@@ -1649,6 +1671,10 @@
   }
   .section-heading {
     padding: 10px 14px 5px;
+  }
+  .prayer-countdown {
+    font-size: 12px;
+    margin-top: 2px;
   }
   .latest-info-card {
     padding: 5px 14px 12px;
