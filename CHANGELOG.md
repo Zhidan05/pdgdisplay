@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Changed — 2026-10-03 20:10 WIB
+- Enlarged only the clock/time text of the prayer countdown by `25%` (`1.25em`) without affecting the surrounding layout or the prayer name labels.
+
 ### Fixed — 2026-10-03 19:04 WIB
 - **Stream Audio Player**: Dirombak ulang keseluruhan logic pada `RriAudioPlayer` (MP3/AAC radio stream) yang sebelumnya memiliki bug "Siaran sedang tidak tersedia" padahal stream aktif.
   - Menghapus paksaan timeout 15 detik yang sebelumnya meng-override state menjadi offline saat stream lambat dimuat.
