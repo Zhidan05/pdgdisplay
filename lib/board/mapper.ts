@@ -1,4 +1,5 @@
 import type { BoardData, InfoItem, Schedule, Station, TickerItem, Settings, InfoAspectRatio } from "@/data/types";
+import { parseYouTubeVideoId, isAudioStreamUrl } from "@/lib/broadcast";
 
 export function normalizeInfoAspectRatio(value: string | null | undefined): InfoAspectRatio {
   switch (value) {
@@ -26,13 +27,49 @@ export function mapBoardData(
   tickersRow: Record<string, unknown>[],
   settingsRow: Record<string, unknown>[]
 ): BoardData {
-  const stations: Station[] = stationsRow.map((r) => ({
-    id: (r.code as string).toLowerCase() as Station["id"],
-    name: r.name as string,
-    frequency: r.frequency as string,
-    tagline: (r.tagline as string) || "",
-    streamUrl: r.stream_url as string,
-  }));
+  const stations: Station[] = stationsRow.map((r) => {
+    const channel = (r.code as string).toLowerCase() as Station["id"];
+    const ytSetting = settingsRow.find((s) => s.key === `stream_youtube_${channel}`);
+    const rriSetting = settingsRow.find((s) => s.key === `stream_rri_${channel}`);
+
+    let youtubeUrl: string | null = null;
+    let rriUrl: string | null = null;
+
+    if (ytSetting !== undefined) {
+      youtubeUrl = (ytSetting.value as string)?.trim() || null;
+    } else if (r.youtube_url !== undefined && r.youtube_url !== null) {
+      youtubeUrl = (r.youtube_url as string)?.trim() || null;
+    } else if (r.stream_url && parseYouTubeVideoId(r.stream_url as string)) {
+      youtubeUrl = (r.stream_url as string).trim();
+    }
+
+    if (rriSetting !== undefined) {
+      rriUrl = (rriSetting.value as string)?.trim() || null;
+    } else if (r.rri_url !== undefined && r.rri_url !== null) {
+      rriUrl = (r.rri_url as string)?.trim() || null;
+    } else if (
+      r.stream_url &&
+      !parseYouTubeVideoId(r.stream_url as string) &&
+      isAudioStreamUrl(r.stream_url as string)
+    ) {
+      rriUrl = (r.stream_url as string).trim();
+    }
+
+    let effectiveStreamUrl = youtubeUrl || rriUrl || null;
+    if (!effectiveStreamUrl && r.stream_url && ytSetting === undefined && rriSetting === undefined) {
+      effectiveStreamUrl = (r.stream_url as string).trim() || null;
+    }
+
+    return {
+      id: channel,
+      name: r.name as string,
+      frequency: r.frequency as string,
+      tagline: (r.tagline as string) || "",
+      streamUrl: effectiveStreamUrl,
+      youtubeUrl,
+      rriUrl,
+    };
+  });
 
   const schedules: Schedule[] = schedulesRow.map((r) => {
     const station = stationsRow.find((s) => s.id === r.station_id);

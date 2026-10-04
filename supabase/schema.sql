@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS public.stations (
   frequency TEXT,
   tagline TEXT,
   stream_url TEXT,
+  youtube_url TEXT,
+  rri_url TEXT,
   logo_path TEXT,
   sort_order INT DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -217,3 +219,40 @@ DROP TRIGGER IF EXISTS tr_check_schedule_conflict ON public.schedules;
 CREATE TRIGGER tr_check_schedule_conflict
   BEFORE INSERT OR UPDATE ON public.schedules
   FOR EACH ROW EXECUTE FUNCTION public.check_schedule_conflict();
+
+-- Trigger Function for Info Terbaru (latest_info) Limit (max 10)
+CREATE OR REPLACE FUNCTION public.check_info_limit()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.display_type = 'latest_info' THEN
+    PERFORM pg_advisory_xact_lock(hashtext('infos_latest_info_limit'));
+    IF (SELECT count(*) FROM public.infos WHERE display_type = 'latest_info') >= 10 THEN
+      RAISE EXCEPTION 'Batas maksimum 10 Info Terbaru telah tercapai. Hapus salah satu data untuk menambahkan data baru.';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS tr_check_info_limit ON public.infos;
+CREATE TRIGGER tr_check_info_limit
+  BEFORE INSERT ON public.infos
+  FOR EACH ROW EXECUTE FUNCTION public.check_info_limit();
+
+-- Trigger Function for Running Text Limit (max 10)
+CREATE OR REPLACE FUNCTION public.check_running_text_limit()
+RETURNS TRIGGER AS $$
+BEGIN
+  PERFORM pg_advisory_xact_lock(hashtext('running_texts_limit'));
+  IF (SELECT count(*) FROM public.running_texts) >= 10 THEN
+    RAISE EXCEPTION 'Batas maksimum 10 Running Text telah tercapai. Hapus salah satu data untuk menambahkan data baru.';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS tr_check_running_text_limit ON public.running_texts;
+CREATE TRIGGER tr_check_running_text_limit
+  BEFORE INSERT ON public.running_texts
+  FOR EACH ROW EXECUTE FUNCTION public.check_running_text_limit();
+

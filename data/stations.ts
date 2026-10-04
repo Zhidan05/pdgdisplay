@@ -6,6 +6,8 @@ export const stations: Station[] = [
     frequency: "95.9 FM",
     tagline: "Kanal informasi & inspirasi",
     streamUrl: "/media/studio-demo.webm",
+    youtubeUrl: null,
+    rriUrl: null,
   },
   {
     id: "pro2",
@@ -13,6 +15,8 @@ export const stations: Station[] = [
     frequency: "90.8 FM",
     tagline: "Suara kreativitas anak muda",
     streamUrl: null,
+    youtubeUrl: null,
+    rriUrl: null,
   },
   {
     id: "pro4",
@@ -20,5 +24,7 @@ export const stations: Station[] = [
     frequency: "92.4 FM",
     tagline: "Suara budaya Nusantara",
     streamUrl: null,
+    youtubeUrl: null,
+    rriUrl: null,
   },
 ];

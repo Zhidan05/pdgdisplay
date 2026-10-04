@@ -12,10 +12,10 @@ export function PrayerCountdown() {
   const currentPrayerRef = useRef<NextPrayer | null>(null);
 
   useEffect(() => {
-    setIsMounted(true);
     let timer: ReturnType<typeof setInterval>;
 
     const init = async () => {
+      setIsMounted(true);
       const currentPrayer = await getNextPrayerAsync(new Date());
       if (!currentPrayer) return;
       
@@ -56,10 +56,8 @@ export function PrayerCountdown() {
         aria-hidden="true"
       >
         <span className="prayer-name">Subuh</span>
-        <div className="prayer-time-group">
-          <span className="prayer-label">dalam</span>
-          <span className="prayer-time">00:00:00</span>
-        </div>
+        <span className="prayer-label">dalam</span>
+        <span className="prayer-time">00:00:00</span>
       </div>
     );
   }
@@ -67,10 +65,8 @@ export function PrayerCountdown() {
   return (
     <div className="prayer-countdown">
       <span className="prayer-name">{nextPrayer.name}</span>
-      <div className="prayer-time-group">
-        <span className="prayer-label">dalam</span>
-        <span className="prayer-time">{countdownText}</span>
-      </div>
+      <span className="prayer-label">dalam</span>
+      <span className="prayer-time">{countdownText}</span>
     </div>
   );
 }

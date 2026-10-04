@@ -2,6 +2,36 @@
 
 ## [Unreleased]
 
+### Changed — 2026-10-04 19:25 WIB
+- **Dua Form Konfigurasi Streaming Terpisah**:
+  - Menyediakan dua form terpisah dan independen pada halaman pengaturan streaming admin (`/admin/streaming`) untuk setiap stasiun (PRO 1, PRO 2, PRO 4):
+    1. **Streaming YouTube**: label `"Link Streaming YouTube"`, input URL YouTube Live/Video, tombol simpan tersendiri, dapat diedit atau dikosongkan.
+    2. **Streaming RRI**: label `"Link Streaming RRI"`, input URL direct stream audio RRI (MP3/AAC), tombol simpan tersendiri, dapat diedit atau dikosongkan. Link RRI bukan link permanen atau hardcoded.
+    3. **Identitas Stasiun**: form terpisah untuk nama stasiun dan frekuensi.
+  - Kedua form streaming bekerja secara independen: menyimpan atau mengosongkan salah satu link tidak memengaruhi nilai link lainnya.
+- **Prioritas Sumber Streaming & Penanganan Kegagalan**:
+  - Menerapkan hierarki prioritas:
+    - YouTube terisi $\rightarrow$ Memutar YouTube sebagai sumber utama; link RRI tetap tersimpan aman.
+    - YouTube kosong + RRI terisi $\rightarrow$ Otomatis memutar audio stream RRI dengan UI status pemutar yang ada.
+    - Kedua link kosong $\rightarrow$ Menampilkan fallback UI `"Siaran sedang tidak tersedia"` dan badge OFF AIR tanpa memutar media apa pun atau layar hitam.
+  - Graceful fallback: Jika YouTube terisi namun gagal diputar (`onError`), sistem otomatis beralih memutar streaming RRI jika URL RRI tersedia.
+  - Penanganan buffering dan penolakan browser autoplay tanpa salah menandai URL sebagai error/invalid.
+- **Penerapan Realtime & Pencegahan Dual Playback**:
+  - Perubahan konfigurasi di admin panel langsung diaplikasikan ke Info Board publik secara realtime tanpa perlu refresh manual.
+  - Mekanisme unmount dan teardown (`destroy()` pada YouTube iframe dan `pause()` / remove `src` / `load()` pada audio HTML5) menjamin tidak ada dua media yang berjalan bersamaan.
+- **Penyimpanan Data & Kompatibilitas**:
+  - Menambahkan migrasi database `supabase/migrations/20261004_streaming_config.sql` dan memperbarui `supabase/schema.sql` untuk kolom `youtube_url` dan `rri_url` pada tabel `stations`.
+  - Menyimpan konfigurasi secara persisten pada tabel `settings` (`stream_youtube_{channel}` dan `stream_rri_{channel}`) dan memperbarui `stations.stream_url` dengan URL aktif untuk kompatibilitas penuh dengan seluruh komponen Info Board (`hasStream`).
+
+### Fixed — 2026-10-04 19:07 WIB
+- **Prayer Countdown Flexbox Distribution**: Mengubah layout `.prayer-countdown` menjadi Flexbox murni (`display: flex; align-items: center; justify-content: space-between;`) dengan 3 elemen langsung (`.prayer-name`, `.prayer-label`, `.prayer-time`) dalam satu baris. Nama shalat berada di ujung kiri box, teks "dalam" berada di tengah box dengan distribusi horizontal `space-between`, dan angka countdown berada di ujung kanan box, tanpa mengubah styling, warna, font, maupun padding yang sudah ada.
+
+### Fixed — 2026-10-04 18:52 WIB
+- **Prayer Countdown Alignment**: Posisikan teks "dalam" tepat di tengah horizontal box countdown waktu shalat menggunakan CSS Grid (`minmax(0, 1fr) auto minmax(0, 1fr)`). Posisi teks tetap konsisten dan tidak bergeser saat nama shalat maupun countdown waktu berubah, dengan nama shalat di sisi kiri dan waktu countdown di sisi kanan.
+- **Pembatasan Maksimal 10 Info Terbaru**: Menerapkan batas kuota maksimal 10 data Info Terbaru pada panel admin dan backend. Tombol tambah tetap aktif dan menampilkan modal pop-up penjelasan jika kuota penuh: `"Batas maksimum 10 Info Terbaru telah tercapai. Hapus salah satu data untuk menambahkan data baru."`.
+- **Pembatasan Maksimal 10 Running Text**: Menerapkan batas kuota maksimal 10 data Running Text pada panel admin dan backend dengan modal pop-up penjelasan jika kuota penuh: `"Batas maksimum 10 Running Text telah tercapai. Hapus salah satu data untuk menambahkan data baru."`.
+- **Backend & Database Validation**: Menambahkan Route Handlers Next.js (`/api/admin/info` dan `/api/admin/running-text`), validasi pre-flight server/client, serta PostgreSQL trigger dengan `pg_advisory_xact_lock` pada `infos` dan `running_texts` untuk mencegah race condition pada request concurrent.
+
 ### Changed — 2026-10-04 13:00 WIB
 - Changed the streaming connection status overlay text from `"Menghubungkan ke siaran RRI..."` to `"Menghubungkan ke streaming RRI"` to meet updated wording requirements.
 

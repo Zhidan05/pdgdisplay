@@ -53,13 +53,28 @@ function TickerForm({
         onClose();
       }
     } else {
+      const { count, error: countErr } = await supabase
+        .from("running_texts")
+        .select("id", { count: "exact", head: true });
+
+      if (!countErr && (count ?? 0) >= 10) {
+        setError("Batas maksimum 10 Running Text telah tercapai. Hapus salah satu data untuk menambahkan data baru.");
+        setLoading(false);
+        return;
+      }
+
       const { error: err } = await supabase.from("running_texts").insert({
         text,
         sort_order: Number(form.get("order")),
         is_active: form.get("active") === "on",
       });
-      if (err) setError(err.message);
-      else {
+      if (err) {
+        if (err.message && (err.message.includes("10") || err.message.toLowerCase().includes("maksimum"))) {
+          setError("Batas maksimum 10 Running Text telah tercapai. Hapus salah satu data untuk menambahkan data baru.");
+        } else {
+          setError(err.message);
+        }
+      } else {
         onSaved(true);
         onClose();
       }
@@ -113,6 +128,7 @@ export function TickerManager() {
   const { ticker } = useBoardData();
   const [editing, setEditing] = useState<TickerItem | null | undefined>();
   const [message, setMessage] = useState("");
+  const [limitNotice, setLimitNotice] = useState<string | null>(null);
   const supabase = createClient();
 
   const toggleActive = async (id: string, active: boolean) => {
@@ -125,13 +141,25 @@ export function TickerManager() {
     if (!error) setMessage(savedMessage(true));
   };
 
+  const isLimitReached = ticker.length >= 10;
+
+  const handleAddClick = () => {
+    if (isLimitReached) {
+      setLimitNotice(
+        "Batas maksimum 10 Running Text telah tercapai. Hapus salah satu data untuk menambahkan data baru."
+      );
+    } else {
+      setEditing(null);
+    }
+  };
+
   return (
     <>
       <PageHeading
         title="Running Text"
         description="Pesan singkat yang mengalir di bagian bawah layar publik."
         action={
-          <button className="button primary" onClick={() => setEditing(null)}>
+          <button className="button primary" onClick={handleAddClick}>
             <Plus size={17} />
             Tambah running text
           </button>
@@ -203,6 +231,28 @@ export function TickerManager() {
             onClose={() => setEditing(undefined)}
             onSaved={(p) => setMessage(savedMessage(p))}
           />
+        </Modal>
+      )}
+      {limitNotice && (
+        <Modal
+          title="Batas Maksimum Tercapai"
+          onClose={() => setLimitNotice(null)}
+        >
+          <div className="limit-alert-content">
+            <p className="text-secondary" style={{ marginBottom: "1.25rem", lineHeight: 1.5 }}>
+              {limitNotice}
+            </p>
+            <div className="form-actions" style={{ justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                className="button primary"
+                onClick={() => setLimitNotice(null)}
+                autoFocus
+              >
+                Mengerti
+              </button>
+            </div>
+          </div>
         </Modal>
       )}
     </>

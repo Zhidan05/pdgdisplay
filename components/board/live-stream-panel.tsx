@@ -5,8 +5,7 @@ import {
   ChannelLogo,
 } from "@/components/shared/broadcast-ui";
 import { MediaImage } from "@/components/shared/media-image";
-import { hasStream } from "@/lib/broadcast";
-import { getStreamSource } from "@/lib/media-utils";
+import { hasStream, parseYouTubeVideoId, isVideoStreamUrl } from "@/lib/broadcast";
 import type { Schedule, Station } from "@/data/types";
 import { useOptionalAudio } from "./audio-context";
 
@@ -347,10 +346,12 @@ function RriAudioPlayer({
   url,
   fallbackImage,
   mode,
+  onFail,
 }: {
   url: string;
   fallbackImage: string;
   mode: StreamRenderMode;
+  onFail?: () => void;
 }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioCtx = useOptionalAudio();
@@ -381,6 +382,7 @@ function RriAudioPlayer({
         }
       } else {
         setStatus("error");
+        onFail?.();
       }
     });
   };
@@ -424,6 +426,7 @@ function RriAudioPlayer({
         }, 1500 * retryCountRef.current);
       } else {
         setStatus("error");
+        onFail?.();
       }
     };
 
@@ -551,47 +554,98 @@ function RriAudioPlayer({
 }
 
 function StreamMedia({
-  url,
+  youtubeUrl,
+  rriUrl,
+  streamUrl,
   fallbackImage,
   mode,
 }: {
-  url: string;
+  youtubeUrl?: string | null;
+  rriUrl?: string | null;
+  streamUrl?: string | null;
   fallbackImage: string;
   mode: StreamRenderMode;
 }) {
-  const [failed, setFailed] = useState(false);
-  const [prevUrl, setPrevUrl] = useState(url);
+  const [youtubeFailed, setYoutubeFailed] = useState(false);
+  const [rriFailed, setRriFailed] = useState(false);
+  const [lastYt, setLastYt] = useState(youtubeUrl);
+  const [lastRri, setLastRri] = useState(rriUrl);
 
-  if (url !== prevUrl) {
-    setPrevUrl(url);
-    setFailed(false);
+  if (youtubeUrl !== lastYt) {
+    setLastYt(youtubeUrl);
+    setYoutubeFailed(false);
+  }
+  if (rriUrl !== lastRri) {
+    setLastRri(rriUrl);
+    setRriFailed(false);
   }
 
-  const source = getStreamSource(url);
+  const cleanYt = youtubeUrl?.trim() || null;
+  const cleanRri = rriUrl?.trim() || null;
+  const cleanStream = streamUrl?.trim() || null;
+
+  const ytVideoId = cleanYt ? parseYouTubeVideoId(cleanYt) : null;
+  const fallbackYtVideoId = !ytVideoId && cleanStream ? parseYouTubeVideoId(cleanStream) : null;
+  const activeYtVideoId = ytVideoId || fallbackYtVideoId;
+
+  // Priority logic:
+  // 1. YouTube if provided and hasn't failed
+  const shouldPlayYouTube = Boolean(activeYtVideoId && !youtubeFailed);
+
+  // 2. RRI if YouTube is empty (or failed) and RRI is provided and hasn't failed
+  const shouldPlayRri = Boolean(
+    (!shouldPlayYouTube || youtubeFailed) &&
+    cleanRri &&
+    !rriFailed
+  );
+
+  // 3. Fallback to legacy video if any
+  const shouldPlayLegacyVideo = Boolean(
+    !shouldPlayYouTube &&
+    !shouldPlayRri &&
+    cleanStream &&
+    isVideoStreamUrl(cleanStream)
+  );
+
+  if (shouldPlayYouTube && activeYtVideoId) {
+    return (
+      <YouTubePlayer
+        key={activeYtVideoId}
+        videoId={activeYtVideoId}
+        onFail={() => setYoutubeFailed(true)}
+        mode={mode}
+      />
+    );
+  }
+
+  if (shouldPlayRri && cleanRri) {
+    return (
+      <RriAudioPlayer
+        key={cleanRri}
+        url={cleanRri}
+        fallbackImage={fallbackImage}
+        mode={mode}
+        onFail={() => setRriFailed(true)}
+      />
+    );
+  }
+
+  if (shouldPlayLegacyVideo && cleanStream) {
+    return (
+      <HtmlVideoPlayer
+        key={cleanStream}
+        url={cleanStream}
+        onFail={() => setRriFailed(true)}
+        mode={mode}
+      />
+    );
+  }
 
   return (
-    <>
-      {!failed && source?.type === "youtube" && (
-        <YouTubePlayer videoId={source.videoId} onFail={() => setFailed(true)} mode={mode} />
-      )}
-      {!failed && source?.type === "video" && (
-        <HtmlVideoPlayer url={source.url} onFail={() => setFailed(true)} mode={mode} />
-      )}
-      {!failed && (source?.type === "audio" || source?.type === "unknown") && (
-        <RriAudioPlayer
-          key={source.url}
-          url={source.url}
-          fallbackImage={fallbackImage}
-          mode={mode}
-        />
-      )}
-      {failed && (
-        <OfflineFallback
-          image={fallbackImage}
-          message="Siaran sedang tidak tersedia"
-        />
-      )}
-    </>
+    <OfflineFallback
+      image={fallbackImage}
+      message="Siaran sedang tidak tersedia"
+    />
   );
 }
 
@@ -608,7 +662,11 @@ export function LiveStreamPanel({
   compact?: boolean;
   mode?: StreamRenderMode;
 }) {
-  const available = hasStream(station.streamUrl);
+  const available =
+    hasStream(station.youtubeUrl) ||
+    hasStream(station.rriUrl) ||
+    hasStream(station.streamUrl);
+
   return (
     <section
       className={`live-panel panel ${compact ? "compact-live" : ""}`}
@@ -617,7 +675,10 @@ export function LiveStreamPanel({
       <div className="live-media">
         {available ? (
           <StreamMedia
-            url={station.streamUrl!}
+            key={station.id}
+            youtubeUrl={station.youtubeUrl}
+            rriUrl={station.rriUrl}
+            streamUrl={station.streamUrl}
             fallbackImage={fallbackImage}
             mode={mode || "broadcast"}
           />

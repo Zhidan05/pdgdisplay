@@ -128,7 +128,7 @@ export async function getScheduleForDate(date: Date): Promise<DailyPrayer | null
 
 export async function getNextPrayerAsync(now: Date = new Date()): Promise<NextPrayer | null> {
   const jakartaNow = getJakartaDate(now);
-  let schedule = await getScheduleForDate(jakartaNow);
+  const schedule = await getScheduleForDate(jakartaNow);
   
   if (!schedule) {
     return null; // fallback gracefully if API fails completely

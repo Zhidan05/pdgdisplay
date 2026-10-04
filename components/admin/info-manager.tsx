@@ -90,6 +90,19 @@ export function InfoForm({
     const supabase = createClient();
     let imageUrl = item?.image || "";
     
+    if (!item) {
+      const { count, error: countErr } = await supabase
+        .from("infos")
+        .select("id", { count: "exact", head: true })
+        .eq("display_type", "latest_info");
+
+      if (!countErr && (count ?? 0) >= 10) {
+        setError("Batas maksimum 10 Info Terbaru telah tercapai. Hapus salah satu data untuk menambahkan data baru.");
+        setLoading(false);
+        return;
+      }
+    }
+
     const fileInput = form.get("imageFile") as File;
     if (fileInput && fileInput.size > 0) {
       setError("Mengoptimalkan dan mengunggah gambar...");
@@ -139,8 +152,16 @@ export function InfoForm({
       }
     } else {
       const { error: err } = await supabase.from("infos").insert(dbValue);
-      if (err) setError(err.message);
-      else {
+      if (err) {
+        if (fileInput && fileInput.size > 0 && imageUrl) {
+          await deleteStorageFile(imageUrl);
+        }
+        if (err.message && (err.message.includes("10") || err.message.toLowerCase().includes("maksimum"))) {
+          setError("Batas maksimum 10 Info Terbaru telah tercapai. Hapus salah satu data untuk menambahkan data baru.");
+        } else {
+          setError(err.message);
+        }
+      } else {
         onSaved(true);
         onClose();
       }
@@ -230,6 +251,7 @@ export function InfoManager() {
   const [editing, setEditing] = useState<InfoItem | null | undefined>();
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
+  const [limitNotice, setLimitNotice] = useState<string | null>(null);
   const supabase = createClient();
   
   const deleteItem = async (id: string, imageUrl: string) => {
@@ -242,6 +264,19 @@ export function InfoManager() {
     }
   };
   
+  const latestInfoCount = info.filter((i) => i.display_type === "latest_info").length;
+  const isLimitReached = latestInfoCount >= 10;
+
+  const handleAddClick = () => {
+    if (isLimitReached) {
+      setLimitNotice(
+        "Batas maksimum 10 Info Terbaru telah tercapai. Hapus salah satu data untuk menambahkan data baru."
+      );
+    } else {
+      setEditing(null);
+    }
+  };
+
   const visible = info.filter((i) =>
     `${i.title} ${i.description}`.toLowerCase().includes(query.toLowerCase()),
   );
@@ -252,7 +287,7 @@ export function InfoManager() {
         title="Info Terbaru & Poster"
         description="Kelola informasi dan poster yang tampil di layar publik."
         action={
-          <button className="button primary" onClick={() => setEditing(null)}>
+          <button className="button primary" onClick={handleAddClick}>
             <Plus size={17} />
             Tambah konten
           </button>
@@ -363,6 +398,26 @@ export function InfoManager() {
             onClose={() => setEditing(undefined)}
             onSaved={(p) => setMessage(savedMessage(p))}
           />
+        </Modal>
+      )}
+      {limitNotice && (
+        <Modal
+          title="Batas Maksimum Tercapai"
+          onClose={() => setLimitNotice(null)}
+        >
+          <p className="text-secondary" style={{ marginBottom: "1.25rem", lineHeight: 1.5 }}>
+            {limitNotice}
+          </p>
+          <div className="form-actions" style={{ justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              className="button primary"
+              onClick={() => setLimitNotice(null)}
+              autoFocus
+            >
+              Mengerti
+            </button>
+          </div>
         </Modal>
       )}
     </>

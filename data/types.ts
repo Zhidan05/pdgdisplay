@@ -11,6 +11,8 @@ export interface Station {
   frequency: string;
   tagline: string;
   streamUrl: string | null;
+  youtubeUrl?: string | null;
+  rriUrl?: string | null;
 }
 export interface Schedule {
   id: string;

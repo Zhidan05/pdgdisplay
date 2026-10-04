@@ -668,18 +668,14 @@
   .prayer-countdown .prayer-name {
     color: var(--accent);
     font-weight: 700;
-  }
-
-  .prayer-countdown .prayer-time-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    white-space: nowrap;
   }
 
   .prayer-countdown .prayer-label {
     color: var(--text-secondary);
     font-weight: 450;
     font-size: 0.95em;
+    white-space: nowrap;
   }
 
   .prayer-countdown .prayer-time {
@@ -687,6 +683,7 @@
     font-weight: 700;
     letter-spacing: 0.5px;
     font-size: 1.25em;
+    white-space: nowrap;
   }
 
   .latest-info {
@@ -1505,8 +1502,57 @@
   .stream-settings form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    margin-top: 20px;
+    gap: 12px;
+  }
+
+  .stream-form-block {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-default);
+    border-radius: 8px;
+    margin-top: 14px;
+  }
+
+  .stream-form-block.identity-block {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .stream-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2px;
+  }
+
+  .stream-form-badge {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .stream-form-badge.yt {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+  }
+
+  .stream-form-badge.rri {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+
+  .stream-form-priority {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 500;
   }
 
   .compact-live .live-caption {
