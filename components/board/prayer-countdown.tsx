@@ -1,32 +1,51 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getNextPrayer, calculateCountdown, type NextPrayer } from "@/lib/prayer-times";
+import { useEffect, useState, useRef } from "react";
+import { getNextPrayerAsync, calculateCountdown, type NextPrayer } from "@/lib/prayer-times";
 
 export function PrayerCountdown() {
   const [nextPrayer, setNextPrayer] = useState<NextPrayer | null>(null);
   const [countdownText, setCountdownText] = useState<string>("");
   const [isMounted, setIsMounted] = useState(false);
+  
+  // Use ref to keep track of the current prayer without needing to add it to dependency array
+  const currentPrayerRef = useRef<NextPrayer | null>(null);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
-    let currentPrayer = getNextPrayer();
-    setNextPrayer(currentPrayer);
-    setCountdownText(calculateCountdown(currentPrayer.time, new Date()));
+    let timer: ReturnType<typeof setInterval>;
 
-    const timer = setInterval(() => {
-      const now = new Date();
-      if (now.getTime() >= currentPrayer.time.getTime()) {
-        // Time passed, get the next one
-        currentPrayer = getNextPrayer(now);
-        setNextPrayer(currentPrayer);
-      }
+    const init = async () => {
+      const currentPrayer = await getNextPrayerAsync(new Date());
+      if (!currentPrayer) return;
       
-      setCountdownText(calculateCountdown(currentPrayer.time, now));
-    }, 1000);
+      setNextPrayer(currentPrayer);
+      currentPrayerRef.current = currentPrayer;
+      setCountdownText(calculateCountdown(currentPrayer.time, new Date()));
 
-    return () => clearInterval(timer);
+      timer = setInterval(async () => {
+        const now = new Date();
+        const activePrayer = currentPrayerRef.current;
+        
+        if (activePrayer && now.getTime() >= activePrayer.time.getTime()) {
+          // Time passed, get the next one asynchronously
+          const next = await getNextPrayerAsync(now);
+          if (next) {
+            setNextPrayer(next);
+            currentPrayerRef.current = next;
+            setCountdownText(calculateCountdown(next.time, now));
+          }
+        } else if (activePrayer) {
+          setCountdownText(calculateCountdown(activePrayer.time, now));
+        }
+      }, 1000);
+    };
+
+    init();
+
+    return () => {
+      if (timer) clearInterval(timer);
+    };
   }, []);
 
   if (!isMounted || !nextPrayer) {

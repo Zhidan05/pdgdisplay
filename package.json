@@ -14,7 +14,6 @@
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.2",
-    "adhan": "^4.4.6",
     "browser-image-compression": "^2.0.2",
     "geist": "^1.7.2",
     "lucide-react": "^1.48.0",

@@ -74,7 +74,7 @@ function YouTubePlayer({ videoId, onFail, mode }: { videoId: string, onFail: () 
   // Initialize player ONLY ONCE when component mounts
   useEffect(() => {
     let isMounted = true;
-    
+
     if (!containerRef.current) return;
     // Create an inner div for YouTube to replace, isolating it from React's DOM management
     containerRef.current.innerHTML = '<div></div>';
@@ -111,7 +111,7 @@ function YouTubePlayer({ videoId, onFail, mode }: { videoId: string, onFail: () 
         const firstScriptTag = document.getElementsByTagName("script")[0];
         firstScriptTag.parentNode?.insertBefore(script, firstScriptTag);
       }
-      
+
       const originalReady = window.onYouTubeIframeAPIReady;
       window.onYouTubeIframeAPIReady = () => {
         if (originalReady) originalReady();
@@ -125,24 +125,24 @@ function YouTubePlayer({ videoId, onFail, mode }: { videoId: string, onFail: () 
     function onPlayerReady(event: any) {
       if (!isMounted) return;
       const player = event.target;
-      
+
       if (isPreview) {
         player.mute();
         return;
       }
-      
+
       player.setVolume(audio.volume);
-      
+
       if (audio.preferredSoundEnabled) {
         player.unMute();
         player.playVideo();
-        
+
         initTimeoutRef.current = setTimeout(() => {
           if (isMounted && player.getPlayerState() !== 1 && player.getPlayerState() !== 3) {
-             audio.setAutoplayBlocked(true);
-             audio.setActualSoundEnabled(false);
-             player.mute();
-             player.playVideo();
+            audio.setAutoplayBlocked(true);
+            audio.setActualSoundEnabled(false);
+            player.mute();
+            player.playVideo();
           }
         }, 1500);
       } else {
@@ -150,7 +150,7 @@ function YouTubePlayer({ videoId, onFail, mode }: { videoId: string, onFail: () 
         player.playVideo();
         audio.setActualSoundEnabled(false);
       }
-      
+
       audio.registerRetryCallback(() => {
         if (!isMounted) return;
         if (player && player.unMute) {
@@ -160,8 +160,8 @@ function YouTubePlayer({ videoId, onFail, mode }: { videoId: string, onFail: () 
           // Check state after programmatic unmute
           setTimeout(() => {
             if (isMounted && player && typeof player.isMuted === 'function') {
-               audio.setActualSoundEnabled(!player.isMuted());
-               if (!player.isMuted()) audio.setAutoplayBlocked(false);
+              audio.setActualSoundEnabled(!player.isMuted());
+              if (!player.isMuted()) audio.setAutoplayBlocked(false);
             }
           }, 100);
         }
@@ -172,28 +172,28 @@ function YouTubePlayer({ videoId, onFail, mode }: { videoId: string, onFail: () 
     function onPlayerStateChange(event: any) {
       if (!isMounted || isPreview) return;
       if (event.data === 1) { // PLAYING
-         const player = event.target;
-         if (player.isMuted()) {
-            audio.setActualSoundEnabled(false);
-         } else {
-            audio.setActualSoundEnabled(true);
-            audio.setAutoplayBlocked(false);
-            if (initTimeoutRef.current) clearTimeout(initTimeoutRef.current);
-         }
+        const player = event.target;
+        if (player.isMuted()) {
+          audio.setActualSoundEnabled(false);
+        } else {
+          audio.setActualSoundEnabled(true);
+          audio.setAutoplayBlocked(false);
+          if (initTimeoutRef.current) clearTimeout(initTimeoutRef.current);
+        }
       }
     }
 
     return () => {
-       isMounted = false;
-       if (initTimeoutRef.current) clearTimeout(initTimeoutRef.current);
-       try {
-         if (playerRef.current && typeof playerRef.current.destroy === 'function') {
-            playerRef.current.destroy();
-         }
-       } catch {
-         // ignore external player teardown errors
-       }
-       playerRef.current = null;
+      isMounted = false;
+      if (initTimeoutRef.current) clearTimeout(initTimeoutRef.current);
+      try {
+        if (playerRef.current && typeof playerRef.current.destroy === 'function') {
+          playerRef.current.destroy();
+        }
+      } catch {
+        // ignore external player teardown errors
+      }
+      playerRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run ONLY once to mount the player
@@ -215,9 +215,9 @@ function YouTubePlayer({ videoId, onFail, mode }: { videoId: string, onFail: () 
         // Verify if unmute was successful (browser might still block if no interaction)
         setTimeout(() => {
           if (playerRef.current && typeof playerRef.current.isMuted === 'function') {
-             const muted = playerRef.current.isMuted();
-             audio.setActualSoundEnabled(!muted);
-             if (muted) audio.setAutoplayBlocked(true);
+            const muted = playerRef.current.isMuted();
+            audio.setActualSoundEnabled(!muted);
+            if (muted) audio.setAutoplayBlocked(true);
           }
         }, 100);
       } else {
@@ -242,12 +242,12 @@ function HtmlVideoPlayer({ url, onFail, mode }: { url: string, onFail: () => voi
 
     if (isPreview) {
       video.muted = true;
-      video.play().catch(() => {});
+      video.play().catch(() => { });
       return;
     }
 
     video.volume = audio.volume / 100;
-    
+
     const playWithAudio = async () => {
       if (audio.preferredSoundEnabled) {
         video.muted = false;
@@ -289,16 +289,16 @@ function HtmlVideoPlayer({ url, onFail, mode }: { url: string, onFail: () => voi
       video.muted = false;
       video.volume = audio.volume / 100;
       video.play().then(() => {
-         if (isMounted) {
-           audio.setActualSoundEnabled(true);
-           audio.setAutoplayBlocked(false);
-         }
+        if (isMounted) {
+          audio.setActualSoundEnabled(true);
+          audio.setAutoplayBlocked(false);
+        }
       }).catch(() => {
-         video.muted = true;
-         if (isMounted) {
-           audio.setActualSoundEnabled(false);
-           audio.setAutoplayBlocked(true);
-         }
+        video.muted = true;
+        if (isMounted) {
+          audio.setActualSoundEnabled(false);
+          audio.setAutoplayBlocked(true);
+        }
       });
     });
 
@@ -312,21 +312,21 @@ function HtmlVideoPlayer({ url, onFail, mode }: { url: string, onFail: () => voi
     if (isPreview) return;
     const video = videoRef.current;
     if (video) {
-       video.volume = audio.volume / 100;
-       if (audio.preferredSoundEnabled) {
-         video.muted = false;
-         video.play().then(() => {
-            audio.setActualSoundEnabled(true);
-            audio.setAutoplayBlocked(false);
-         }).catch(() => {
-            video.muted = true;
-            audio.setActualSoundEnabled(false);
-            audio.setAutoplayBlocked(true);
-         });
-       } else {
-         video.muted = true;
-         audio.setActualSoundEnabled(false);
-       }
+      video.volume = audio.volume / 100;
+      if (audio.preferredSoundEnabled) {
+        video.muted = false;
+        video.play().then(() => {
+          audio.setActualSoundEnabled(true);
+          audio.setAutoplayBlocked(false);
+        }).catch(() => {
+          video.muted = true;
+          audio.setActualSoundEnabled(false);
+          audio.setAutoplayBlocked(true);
+        });
+      } else {
+        video.muted = true;
+        audio.setActualSoundEnabled(false);
+      }
     }
   }, [audio?.volume, audio?.preferredSoundEnabled, isPreview]);
 
@@ -420,7 +420,7 @@ function RriAudioPlayer({
         setTimeout(() => {
           if (!isMounted) return;
           audio.load();
-          audio.play().catch(() => {});
+          audio.play().catch(() => { });
         }, 1500 * retryCountRef.current);
       } else {
         setStatus("error");
@@ -493,7 +493,7 @@ function RriAudioPlayer({
     if (audioCtx.preferredSoundEnabled) {
       audio.muted = false;
       if (audio.paused && (status === "playing" || status === "blocked")) {
-        audio.play().catch(() => {});
+        audio.play().catch(() => { });
       }
     } else {
       audio.muted = true;
@@ -505,7 +505,7 @@ function RriAudioPlayer({
 
   switch (status) {
     case "connecting":
-      message = "Menghubungkan ke siaran RRI...";
+      message = "Menghubungkan ke streaming RRI...";
       break;
     case "playing":
       message = "Siaran radio sedang diputar";

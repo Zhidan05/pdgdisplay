@@ -1,10 +1,3 @@
-import { Coordinates, CalculationMethod, PrayerTimes, Prayer } from "adhan";
-
-export const RRI_PADANG_COORDINATES = {
-  latitude: -0.9471,
-  longitude: 100.4172,
-};
-
 export type PrayerName = "Subuh" | "Dzuhur" | "Ashar" | "Maghrib" | "Isya";
 
 export type NextPrayer = {
@@ -12,17 +5,26 @@ export type NextPrayer = {
   time: Date;
 };
 
-// Use Muslim World League as default calculation parameters.
-// This is a common standard, though Kemenag often uses Makkah or MWL with tweaks.
-// We explicitly specify our parameters here so it's documented.
-export function getCalculationParameters() {
-  const params = CalculationMethod.MuslimWorldLeague();
-  // Typically Ashar follows Shafi'i madhab in Indonesia
-  params.madhab = "shafi";
-  return params;
-}
+// Represents a full day's schedule from API
+export type DailyPrayer = {
+  tanggal: number;
+  tanggal_lengkap: string; // e.g. "2026-10-01"
+  hari: string;
+  imsak: string;
+  subuh: string;
+  terbit: string;
+  dhuha: string;
+  dzuhur: string;
+  ashar: string;
+  maghrib: string;
+  isya: string;
+};
 
-// Helper to get a Date object whose local components (getFullYear, etc) match the actual date in WIB
+// In-memory cache
+const prayerCache = new Map<string, DailyPrayer>();
+let isFetching = false;
+const fetchQueue: Array<(schedule: DailyPrayer | null) => void> = [];
+
 export function getJakartaDate(now: Date = new Date()): Date {
   const formatter = new Intl.DateTimeFormat("en-US", {
     timeZone: "Asia/Jakarta",
@@ -34,8 +36,7 @@ export function getJakartaDate(now: Date = new Date()): Date {
     second: "numeric",
     hour12: false,
   });
-  // Note: we want the Date's *local* values to match the Jakarta wall time, 
-  // so adhan extracts the correct year, month, and day.
+  
   const parts = formatter.formatToParts(now);
   const p = {} as Record<string, string>;
   for (const part of parts) {
@@ -43,7 +44,7 @@ export function getJakartaDate(now: Date = new Date()): Date {
       p[part.type] = part.value;
     }
   }
-  // Create a local date using the extracted values
+  
   return new Date(
     parseInt(p.year, 10),
     parseInt(p.month, 10) - 1,
@@ -54,40 +55,112 @@ export function getJakartaDate(now: Date = new Date()): Date {
   );
 }
 
-export function getPrayerTimes(date: Date = new Date()): PrayerTimes {
-  const jakartaDate = getJakartaDate(date);
-  const coordinates = new Coordinates(
-    RRI_PADANG_COORDINATES.latitude,
-    RRI_PADANG_COORDINATES.longitude
-  );
-  return new PrayerTimes(coordinates, jakartaDate, getCalculationParameters());
+// YYYY-MM-DD in local Jakarta time
+export function formatDateKey(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
-export function getNextPrayer(now: Date = new Date()): NextPrayer {
-  const todayTimes = getPrayerTimes(now);
+// Parses "HH:mm" to a Date object matching the given local Jakarta date
+function parsePrayerTime(date: Date, timeStr: string): Date {
+  const [hh, mm] = timeStr.split(":").map(Number);
+  const result = new Date(date.getTime());
+  result.setHours(hh, mm, 0, 0);
+  return result;
+}
+
+export async function fetchMonthlySchedule(year: number, month: number): Promise<void> {
+  try {
+    const res = await fetch("https://equran.id/api/v2/shalat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        provinsi: "Sumatera Barat",
+        kabkota: "Kota Padang",
+        bulan: month,
+        tahun: year,
+      }),
+    });
+    
+    if (!res.ok) throw new Error("API request failed");
+    
+    const json = await res.json();
+    if (json.data && json.data.jadwal && Array.isArray(json.data.jadwal)) {
+      json.data.jadwal.forEach((day: DailyPrayer) => {
+        const key = `prayer_schedule_${day.tanggal_lengkap}`;
+        prayerCache.set(key, day);
+      });
+    }
+  } catch (err) {
+    console.error("Failed to fetch equran prayer schedule:", err);
+  }
+}
+
+export async function getScheduleForDate(date: Date): Promise<DailyPrayer | null> {
+  const key = `prayer_schedule_${formatDateKey(date)}`;
+  if (prayerCache.has(key)) {
+    return prayerCache.get(key)!;
+  }
   
-  const prayers: { name: PrayerName; time: Date }[] = [
-    { name: "Subuh", time: todayTimes.fajr },
-    { name: "Dzuhur", time: todayTimes.dhuhr },
-    { name: "Ashar", time: todayTimes.asr },
-    { name: "Maghrib", time: todayTimes.maghrib },
-    { name: "Isya", time: todayTimes.isha },
+  if (isFetching) {
+    return new Promise((resolve) => {
+      fetchQueue.push(resolve);
+    });
+  }
+  
+  isFetching = true;
+  await fetchMonthlySchedule(date.getFullYear(), date.getMonth() + 1);
+  isFetching = false;
+  
+  const schedule = prayerCache.get(key) || null;
+  
+  while (fetchQueue.length > 0) {
+    const resolve = fetchQueue.shift();
+    if (resolve) resolve(schedule);
+  }
+  
+  return schedule;
+}
+
+export async function getNextPrayerAsync(now: Date = new Date()): Promise<NextPrayer | null> {
+  const jakartaNow = getJakartaDate(now);
+  let schedule = await getScheduleForDate(jakartaNow);
+  
+  if (!schedule) {
+    return null; // fallback gracefully if API fails completely
+  }
+  
+  const prayers: { name: PrayerName; timeStr: string }[] = [
+    { name: "Subuh", timeStr: schedule.subuh },
+    { name: "Dzuhur", timeStr: schedule.dzuhur },
+    { name: "Ashar", timeStr: schedule.ashar },
+    { name: "Maghrib", timeStr: schedule.maghrib },
+    { name: "Isya", timeStr: schedule.isya },
   ];
 
   for (const prayer of prayers) {
-    if (prayer.time.getTime() > now.getTime()) {
-      return prayer;
+    const time = parsePrayerTime(jakartaNow, prayer.timeStr);
+    if (time.getTime() > jakartaNow.getTime()) {
+      return { name: prayer.name, time };
     }
   }
 
   // If no more prayers today (after Isya), get Subuh for tomorrow
-  const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  const tomorrowTimes = getPrayerTimes(tomorrow);
+  const tomorrow = new Date(jakartaNow.getTime() + 24 * 60 * 60 * 1000);
+  const tomorrowSchedule = await getScheduleForDate(tomorrow);
   
-  return {
-    name: "Subuh",
-    time: tomorrowTimes.fajr,
-  };
+  if (tomorrowSchedule) {
+    return {
+      name: "Subuh",
+      time: parsePrayerTime(tomorrow, tomorrowSchedule.subuh),
+    };
+  }
+  
+  return null;
 }
 
 export function calculateCountdown(target: Date, now: Date): string {

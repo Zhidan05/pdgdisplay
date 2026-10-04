@@ -39,6 +39,33 @@ export function ScheduleItem({
     </article>
   );
 }
+const CHANNEL_COLORS: Record<string, { accent: string; soft: string; muted: string; ring: string }> = {
+  pro1: {
+    accent: "#ff7a00",
+    soft: "rgba(255, 122, 0, 0.15)",
+    muted: "rgba(255, 122, 0, 0.4)",
+    ring: "rgba(255, 122, 0, 0.5)",
+  },
+  pro2: {
+    accent: "#19b5e8",
+    soft: "rgba(25, 181, 232, 0.15)",
+    muted: "rgba(25, 181, 232, 0.4)",
+    ring: "rgba(25, 181, 232, 0.5)",
+  },
+  pro3: {
+    accent: "#ef4444",
+    soft: "rgba(239, 68, 68, 0.15)",
+    muted: "rgba(239, 68, 68, 0.4)",
+    ring: "rgba(239, 68, 68, 0.5)",
+  },
+  pro4: {
+    accent: "#24c77b",
+    soft: "rgba(36, 199, 123, 0.15)",
+    muted: "rgba(36, 199, 123, 0.4)",
+    ring: "rgba(36, 199, 123, 0.5)",
+  },
+};
+
 export function TodaySchedule({
   schedules,
   stations,
@@ -98,8 +125,22 @@ export function TodaySchedule({
           
           if (visible.length === 0) return null;
           
+          const theme = CHANNEL_COLORS[st.id] || CHANNEL_COLORS.pro1;
+          
           return (
-            <div key={st.id} className="channel-schedule-group" style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+            <div 
+              key={st.id} 
+              className="channel-schedule-group" 
+              style={{ 
+                display: "flex", 
+                flexDirection: "column", 
+                gap: "0",
+                "--accent": theme.accent,
+                "--accent-soft": theme.soft,
+                "--accent-muted": theme.muted,
+                "--ring": theme.ring,
+              } as React.CSSProperties}
+            >
               <div style={{ display: "flex", alignItems: "center", gap: "12px", borderBottom: "2px solid var(--border-subtle)", paddingBottom: "8px", marginBottom: "4px", paddingLeft: "4px" }}>
                 <img
                   src={`/rri/${st.id}.png`}

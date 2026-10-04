@@ -15,6 +15,7 @@
   --accent-orange: #ff7a00;
   --pro1: #ff7a00;
   --pro2: #19b5e8;
+  --pro3: #ef4444;
   --pro4: #24c77b;
   --status-on-air: #22d99a;
   --status-off-air: #7a899a;
@@ -146,6 +147,10 @@
 
   .pro2 {
     --channel: var(--pro2);
+  }
+
+  .pro3 {
+    --channel: var(--pro3);
   }
 
   .pro4 {

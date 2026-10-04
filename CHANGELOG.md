@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+### Changed — 2026-10-04 13:00 WIB
+- Changed the streaming connection status overlay text from `"Menghubungkan ke siaran RRI..."` to `"Menghubungkan ke streaming RRI"` to meet updated wording requirements.
+
+### Changed — 2026-10-04 12:58 WIB
+- Migrated prayer schedule data source from local `adhan.js` astronomical calculations to official EQuran.id API.
+- Implemented automatic monthly data fetching (`api/v2/shalat`) using fixed geolocation (Padang, Sumatera Barat).
+- Configured local caching and auto-fetch mechanism when crossing dates or missing data.
+- Rewrote the prayer countdown component to seamlessly integrate async API fetching without modifying the UI or introducing layout shifts.
+- Removed `adhan` dependency entirely from the project.
+
+### Fixed — 2026-10-04 12:53 WIB
+- Fixed "JADWAL HARI INI" panel so schedule items always display the accent color belonging to their respective PRO channel (PRO 1 orange, PRO 2 blue, PRO 3 red, PRO 4 green), regardless of the globally active channel in the header.
+- Added `.pro3` class and `--pro3` variable to `globals.css` to ensure rendering consistency for PRO 3 items when present.
 ### Changed — 2026-10-03 20:41 WIB
 - Modified the prayer countdown container to span exactly `48%` of the parent content area, aligning its right edge perfectly flush with the 16:9 poster image below it. 
 - Restructured the prayer text into a flex layout (`space-between`), pushing the prayer name to the far left and the countdown time to the far right for a clean dashboard alignment.
