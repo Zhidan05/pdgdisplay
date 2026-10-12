@@ -13,7 +13,7 @@ export function RunningTicker({ items }: { items: TickerItem[] }) {
     <footer className="running-ticker" aria-label="Informasi terkini">
       <div className="ticker-label">
         <AudioLines size={18} />
-        INFO TERKINI
+        RRI PADANG
       </div>
       <div className="ticker-window">
         <div
@@ -39,7 +39,7 @@ export function RunningTicker({ items }: { items: TickerItem[] }) {
         </div>
       </div>
       <div className="ticker-signature">
-        RRI <span>PADANG</span>
+        LFGDev
       </div>
     </footer>
   );

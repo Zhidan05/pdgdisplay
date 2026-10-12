@@ -536,7 +536,7 @@
 
   .live-top .channel-img {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
-    height: 24px !important;
+    height: 50px !important;
   }
 
   .live-footer {
@@ -1617,6 +1617,10 @@
 
   .compact-live .live-top .channel-badge {
     font-size: 11px;
+  }
+
+  .compact-live .live-top .channel-img {
+    height: 24px !important;
   }
 
   .field {
