@@ -29,7 +29,7 @@ export function LatestInfoCard({ item }: { item: InfoItem }) {
   const safeRatio = normalizeInfoAspectRatio(item.ratio);
   const ratioConfig = ASPECT_RATIOS[safeRatio];
   const ratioValue = ratioConfig ? ratioConfig.value : 0.8;
-  
+
   return (
     <article
       className={`latest-info-card ${ratioValue < 1 ? "portrait" : "landscape"}`}
@@ -64,7 +64,7 @@ export function LatestInfoCarousel({ items }: { items: InfoItem[] }) {
         <div className="section-title-group" style={{ display: "flex", flexDirection: "column", flex: "0 0 48%" }}>
           <h2>
             <i />
-            INFO TERBARU
+            KABA SAKILEK
           </h2>
           <PrayerCountdown />
         </div>
@@ -114,7 +114,7 @@ export function LatestInfoCarousel({ items }: { items: InfoItem[] }) {
 export function MainPoster({ items }: { items: InfoItem[] }) {
   const { settings } = useBoardData();
   const { index, select, paused, toggle } = useCarousel(items.length, settings.mainImageInterval * 1000);
-  
+
   return (
     <section
       className="main-poster panel"
@@ -124,33 +124,33 @@ export function MainPoster({ items }: { items: InfoItem[] }) {
       {items.length ? (
         <div className="main-image-frame" style={{ position: "relative" }}>
           {items.map((item, i) => (
-             <div 
-               key={item.image} 
-               style={{ 
-                 position: "absolute", 
-                 inset: 0,
-                 opacity: i === index ? 1 : 0, 
-                 transition: "opacity 500ms ease-in-out",
-                 zIndex: i === index ? 1 : 0
-               }}
-             >
-               <MediaImage
-                 src={item.image}
-                 alt={item.title || "Gambar Utama"}
-                 priority={i === index || i === (index + 1) % items.length}
-                 className="main-image-content"
-               />
-             </div>
+            <div
+              key={item.image}
+              style={{
+                position: "absolute",
+                inset: 0,
+                opacity: i === index ? 1 : 0,
+                transition: "opacity 500ms ease-in-out",
+                zIndex: i === index ? 1 : 0
+              }}
+            >
+              <MediaImage
+                src={item.image}
+                alt={item.title || "Gambar Utama"}
+                priority={i === index || i === (index + 1) % items.length}
+                className="main-image-content"
+              />
+            </div>
           ))}
         </div>
       ) : (
         <div className="main-image-frame" style={{ position: "relative" }}>
-           <MediaImage
-             src={settings.fallbackImage}
-             alt="Gambar Utama Fallback"
-             priority
-             className="main-image-content"
-           />
+          <MediaImage
+            src={settings.fallbackImage}
+            alt="Gambar Utama Fallback"
+            priority
+            className="main-image-content"
+          />
         </div>
       )}
       {items.length > 1 && (
