@@ -32,6 +32,7 @@ const navigation = [
   { href: "/admin/broadcast-status", label: "Status Siaran", icon: Radio },
   { href: "/admin/running-text", label: "Running Text", icon: AudioLines },
   { href: "/admin/settings", label: "Pengaturan", icon: Settings2 },
+  { href: "/admin/profile", label: "Profil Admin", icon: UserRound },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -159,9 +160,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <Link className="button secondary info-board-btn" href="/" target="_blank">
               <span className="info-board-text">Lihat Info Board</span> <ExternalLink size={15} />
             </Link>
-            <span className="operator-avatar" title="Operator lokal">
+            <Link
+              href="/admin/profile"
+              className={`operator-avatar ${path === "/admin/profile" ? "active" : ""}`}
+              title="Profil Admin"
+              aria-label="Profil Admin"
+            >
               <UserRound size={19} />
-            </span>
+            </Link>
           </div>
         </header>
         <main className="admin-content">{children}</main>
