@@ -64,7 +64,7 @@ export function LatestInfoCarousel({ items }: { items: InfoItem[] }) {
         <div className="section-title-group" style={{ display: "flex", flexDirection: "column", flex: "0 0 48%" }}>
           <h2>
             <i />
-            KABA SAKILEK
+            KABA SAKILEH
           </h2>
           <PrayerCountdown />
         </div>
